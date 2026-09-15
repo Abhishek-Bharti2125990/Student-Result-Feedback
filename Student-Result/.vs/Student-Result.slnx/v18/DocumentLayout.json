@@ -1,0 +1,118 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "C:\\Users\\2488578\\source\\repos\\Student-Result\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\navbar.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\components\\navbar.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\dashboard\\TeacherDashboard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\dashboard\\TeacherDashboard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\dashboard\\StudentDashboard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\dashboard\\StudentDashboard.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\auth.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\components\\auth.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\App.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\App.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\protectedRoute.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:src\\components\\protectedRoute.tsx||{0F2454B1-A556-402D-A7D0-1FDE7F99DEE0}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "protectedRoute.tsx",
+              "DocumentMoniker": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\protectedRoute.tsx",
+              "RelativeDocumentMoniker": "src\\components\\protectedRoute.tsx",
+              "ToolTip": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\protectedRoute.tsx",
+              "RelativeToolTip": "src\\components\\protectedRoute.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAACAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-09-10T09:04:50.681Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "navbar.tsx",
+              "DocumentMoniker": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\navbar.tsx",
+              "RelativeDocumentMoniker": "src\\components\\navbar.tsx",
+              "ToolTip": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\navbar.tsx",
+              "RelativeToolTip": "src\\components\\navbar.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACAAAAAaAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-09-10T09:03:41.566Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "TeacherDashboard.tsx",
+              "DocumentMoniker": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\dashboard\\TeacherDashboard.tsx",
+              "RelativeDocumentMoniker": "src\\dashboard\\TeacherDashboard.tsx",
+              "ToolTip": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\dashboard\\TeacherDashboard.tsx",
+              "RelativeToolTip": "src\\dashboard\\TeacherDashboard.tsx",
+              "ViewState": "AgIAABUBAAAAAAAAAAAQwAMAAAANAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-09-10T09:01:49.795Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "StudentDashboard.tsx",
+              "DocumentMoniker": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\dashboard\\StudentDashboard.tsx",
+              "RelativeDocumentMoniker": "src\\dashboard\\StudentDashboard.tsx",
+              "ToolTip": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\dashboard\\StudentDashboard.tsx",
+              "RelativeToolTip": "src\\dashboard\\StudentDashboard.tsx",
+              "ViewState": "AgIAAIABAAAAAAAAAAAcwHYCAAAgAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-09-10T09:01:04.784Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "auth.tsx",
+              "DocumentMoniker": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\auth.tsx",
+              "RelativeDocumentMoniker": "src\\components\\auth.tsx",
+              "ToolTip": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\components\\auth.tsx",
+              "RelativeToolTip": "src\\components\\auth.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABYAAAAPAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-09-10T08:56:51.111Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "App.tsx",
+              "DocumentMoniker": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\App.tsx",
+              "RelativeDocumentMoniker": "src\\App.tsx",
+              "ToolTip": "C:\\Users\\2488578\\source\\repos\\Student-Result\\src\\App.tsx",
+              "RelativeToolTip": "src\\App.tsx",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAB8AAAAQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003213|",
+              "WhenOpened": "2026-09-10T08:55:05.341Z"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
