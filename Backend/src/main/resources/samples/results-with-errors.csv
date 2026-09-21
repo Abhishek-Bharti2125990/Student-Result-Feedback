@@ -1,0 +1,14 @@
+admission_no,exam_code,subject_code,marks_obtained,max_marks,attempted,remarks,topic_breakdown
+STU1001,UT2-2025,MATH,66,100,true,valid row,Algebra:14/25|Geometry:18/25|Trigonometry:17/25|Statistics:17/25
+STU9999,UT2-2025,MATH,70,100,true,rejected: unknown admission number,
+STU1002,NOPE-2025,MATH,70,100,true,rejected: unknown exam code,
+STU1003,UT2-2025,XYZ,70,100,true,rejected: unknown subject code,
+STU1004,UT2-2025,MATH,abc,100,true,rejected: marks are not a number,
+STU1005,UT2-2025,MATH,140,100,true,rejected: marks exceed the maximum,
+STU1006,UT2-2025,MATH,70,0,true,rejected: maximum is zero,
+STU1007,UT2-2025,MATH,,100,true,rejected: marks are blank,
+STU1008,UT2-2025,MATH,70,100,true,rejected: topic not defined for this subject,Photosynthesis:10/25
+STU1002,UT2-2025,SCI,60,100,true,rejected: topic maximums exceed the paper total,Physics - Motion:25/50|Physics - Optics:25/60
+STU1003,UT2-2025,SCI,58,100,maybe,rejected: attempted is not a boolean,
+STU1004,UT2-2025,SCI,55,100,true,rejected: malformed topic breakdown,Physics - Motion 12 of 25
+STU1005,UT2-2025,ENG,49,100,true,valid row,

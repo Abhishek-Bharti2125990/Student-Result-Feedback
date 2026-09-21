@@ -1,0 +1,47 @@
+spring:
+  datasource:
+    # In-memory for tests so a run never touches ./data or leaves state behind.
+    url: jdbc:h2:mem:srip-test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  jpa:
+    hibernate:
+      ddl-auto: none
+
+  flyway:
+    enabled: true
+    clean-disabled: false
+
+  batch:
+    jdbc:
+      # Flyway V3 owns the BATCH_* tables here too, so tests exercise the same
+      # schema path as a real run.
+      initialize-schema: never
+    job:
+      enabled: false
+
+app:
+  jwt:
+    secret: "test-only-signing-secret-that-is-long-enough-for-hs256"
+    issuer: srip-test
+    access-token-ttl: PT5M
+    refresh-token-ttl: PT1H
+
+  upload:
+    directory: ./target/test-uploads
+
+  demo:
+    seed-users: true
+    default-password: "Passw0rd!"
+
+  claude:
+    # Blank on purpose: tests must never make a billed network call.
+    api-key: ""
+    enabled: false
+
+logging:
+  level:
+    org.springframework.batch: WARN
+    org.hibernate: WARN

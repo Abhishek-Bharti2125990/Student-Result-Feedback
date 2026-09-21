@@ -1,0 +1,117 @@
+spring:
+  application:
+    name: student-result-intelligence
+
+  # Local, file-backed SQL database. No server to install.
+  # To move to MySQL/PostgreSQL: swap url/driver/username/password only.
+  datasource:
+    url: jdbc:h2:file:./data/srip;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: ""
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+  jpa:
+    open-in-view: false
+    hibernate:
+      # Flyway owns the schema. Hibernate never touches DDL.
+      ddl-auto: none
+    properties:
+      hibernate:
+        format_sql: false
+        jdbc:
+          batch_size: 50
+        order_inserts: true
+        order_updates: true
+
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+  batch:
+    jdbc:
+      # The BATCH_* metadata tables are created by Flyway migration V3, not by
+      # Boot. Boot's `embedded` mode only recognises an in-memory H2 URL, so a
+      # file-backed database would silently start with no batch tables.
+      initialize-schema: never
+    job:
+      # Jobs are launched by the upload endpoint, never automatically at startup.
+      enabled: false
+
+  servlet:
+    multipart:
+      max-file-size: 25MB
+      max-request-size: 25MB
+
+  jackson:
+    default-property-inclusion: non_null
+    serialization:
+      write-dates-as-timestamps: false
+
+server:
+  port: 8080
+  error:
+    include-message: always
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+
+app:
+  jwt:
+    # CHANGE THIS. Must be at least 32 characters (256 bits) for HS256.
+    secret: "change-me-local-dev-secret-key-must-be-at-least-32-bytes-long"
+    issuer: srip
+    access-token-ttl: PT30M
+    refresh-token-ttl: P7D
+
+  upload:
+    # Where uploaded CSV files are staged before the batch job reads them.
+    directory: ./data/uploads
+
+  grading:
+    # Percentage floor -> grade. Evaluated highest floor first.
+    bands:
+      - { min-percentage: 90, grade: "A+", points: 10 }
+      - { min-percentage: 80, grade: "A",  points: 9 }
+      - { min-percentage: 70, grade: "B+", points: 8 }
+      - { min-percentage: 60, grade: "B",  points: 7 }
+      - { min-percentage: 50, grade: "C",  points: 6 }
+      - { min-percentage: 40, grade: "D",  points: 5 }
+      - { min-percentage: 0,  grade: "F",  points: 0 }
+    pass-percentage: 40
+
+  analytics:
+    # A subject/topic at or below this percentage is flagged weak.
+    weak-subject-threshold: 50
+    weak-topic-threshold: 50
+    # Also flag a subject this many points below the student's own average.
+    relative-weakness-margin: 15
+    trend-min-exams: 2
+
+  claude:
+    # Read from the ANTHROPIC_API_KEY environment variable.
+    # When blank the platform runs in rule-based fallback mode: every AI
+    # endpoint still returns feedback, generated locally without a network call.
+    api-key: ${ANTHROPIC_API_KEY:}
+    model: claude-opus-5
+    max-tokens: 8000
+    timeout: PT120S
+    enabled: true
+
+  demo:
+    # Creates one login per role on first start (see README for credentials).
+    seed-users: true
+    default-password: Passw0rd!
+
+logging:
+  level:
+    com.srip: INFO
+    org.springframework.batch: INFO
