@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import AuthPage from './components/auth';
-import StudentDashboard from './dashboard/StudentDashboard';
-import TeacherDashboard from './dashboard/TeacherDashboard';
+import StudentDashboard from './dashboard/Student/StudentDashboard';
+import TeacherDashboard from './dashboard/Teacher/TeacherDashboard';
 import { Navbar } from './components/navbar';
 import { ProtectedRoute } from './components/protectedRoute';
 
