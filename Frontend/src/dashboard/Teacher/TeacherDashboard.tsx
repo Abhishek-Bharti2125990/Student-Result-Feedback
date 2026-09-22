@@ -18,7 +18,7 @@ import {
     Filter,
     Users
 } from 'lucide-react';
-import { useAppSelector } from '../redux/hooks';
+import { useAppSelector } from '../../redux/hooks';
 
 // Interfaces
 interface StudentResultRecord {
