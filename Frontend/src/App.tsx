@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import React from 'react';
 import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
 import { useAppDispatch, useAppSelector } from './redux/hooks';
@@ -7,6 +8,14 @@ import AuthPage from './auth/AuthPage';
 import StudentDashboard from './dashboard/StudentDashboard';
 import TeacherDashboard from './dashboard/TeacherDashboard';
 import Home from './home/Home';
+=======
+// src/App.tsx
+import React, { useState } from 'react';
+import { BrowserRouter, Routes, Route, Navigate, useNavigate } from 'react-router-dom';
+import AuthPage from './components/auth';
+import StudentDashboard from './dashboard/Student/StudentDashboard';
+import TeacherDashboard from './dashboard/Teacher/TeacherDashboard';
+>>>>>>> 01a5b6c5b6006c7e3ba12847866f4c9a6e5f164a
 import { Navbar } from './components/navbar';
 import { ProtectedRoute } from './components/protectedRoute';
 

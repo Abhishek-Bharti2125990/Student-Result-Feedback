@@ -1,0 +1,41 @@
+admission_no,exam_code,subject_code,marks_obtained,max_marks,attempted,remarks,topic_breakdown
+STU1001,UT1-2025,MATH,78,100,true,,Algebra:12/25|Geometry:22/25|Trigonometry:23/25|Statistics:21/25
+STU1002,UT1-2025,MATH,92,100,true,,Algebra:23/25|Geometry:23/25|Trigonometry:23/25|Statistics:23/25
+STU1003,UT1-2025,MATH,55,100,true,,Algebra:10/25|Geometry:15/25|Trigonometry:16/25|Statistics:14/25
+STU1004,UT1-2025,MATH,68,100,true,,Algebra:13/25|Geometry:18/25|Trigonometry:19/25|Statistics:18/25
+STU1005,UT1-2025,MATH,32,100,true,Needs remedial support,Algebra:6/25|Geometry:8/25|Trigonometry:9/25|Statistics:9/25
+STU1006,UT1-2025,MATH,85,100,true,,Algebra:20/25|Geometry:22/25|Trigonometry:22/25|Statistics:21/25
+STU1007,UT1-2025,MATH,61,100,true,,Algebra:11/25|Geometry:17/25|Trigonometry:17/25|Statistics:16/25
+STU1008,UT1-2025,MATH,74,100,true,,Algebra:15/25|Geometry:20/25|Trigonometry:20/25|Statistics:19/25
+STU1001,UT1-2025,SCI,82,100,true,,Physics - Motion:20/25|Physics - Optics:21/25|Chemistry - Reactions:20/25|Biology - Life Processes:21/25
+STU1002,UT1-2025,SCI,88,100,true,,Physics - Motion:22/25|Physics - Optics:22/25|Chemistry - Reactions:22/25|Biology - Life Processes:22/25
+STU1003,UT1-2025,SCI,48,100,true,,Physics - Motion:9/25|Physics - Optics:13/25|Chemistry - Reactions:14/25|Biology - Life Processes:12/25
+STU1004,UT1-2025,SCI,71,100,true,,Physics - Motion:16/25|Physics - Optics:18/25|Chemistry - Reactions:19/25|Biology - Life Processes:18/25
+STU1005,UT1-2025,SCI,38,100,true,,Physics - Motion:7/25|Physics - Optics:10/25|Chemistry - Reactions:11/25|Biology - Life Processes:10/25
+STU1006,UT1-2025,SCI,79,100,true,,Physics - Motion:19/25|Physics - Optics:20/25|Chemistry - Reactions:20/25|Biology - Life Processes:20/25
+STU1007,UT1-2025,SCI,58,100,true,,Physics - Motion:12/25|Physics - Optics:15/25|Chemistry - Reactions:16/25|Biology - Life Processes:15/25
+STU1008,UT1-2025,SCI,77,100,true,,Physics - Motion:18/25|Physics - Optics:20/25|Chemistry - Reactions:20/25|Biology - Life Processes:19/25
+STU1001,UT1-2025,ENG,88,100,true,,
+STU1002,UT1-2025,ENG,84,100,true,,
+STU1003,UT1-2025,ENG,67,100,true,,
+STU1004,UT1-2025,ENG,79,100,true,,
+STU1005,UT1-2025,ENG,45,100,true,,
+STU1006,UT1-2025,ENG,92,100,true,,
+STU1007,UT1-2025,ENG,54,100,true,,
+STU1008,UT1-2025,ENG,81,100,true,,
+STU1001,UT1-2025,SOC,75,100,true,,
+STU1002,UT1-2025,SOC,90,100,true,,
+STU1003,UT1-2025,SOC,60,100,true,,
+STU1004,UT1-2025,SOC,66,100,true,,
+STU1005,UT1-2025,SOC,41,100,true,,
+STU1006,UT1-2025,SOC,81,100,true,,
+STU1007,UT1-2025,SOC,63,100,true,,
+STU1008,UT1-2025,SOC,70,100,true,,
+STU1001,UT1-2025,CS,91,100,true,,
+STU1002,UT1-2025,CS,86,100,true,,
+STU1003,UT1-2025,CS,72,100,true,,
+STU1004,UT1-2025,CS,74,100,true,,
+STU1005,UT1-2025,CS,36,100,true,,
+STU1006,UT1-2025,CS,88,100,true,,
+STU1007,UT1-2025,CS,69,100,true,,
+STU1008,UT1-2025,CS,79,100,true,,

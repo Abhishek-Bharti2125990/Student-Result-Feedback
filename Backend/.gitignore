@@ -1,0 +1,15 @@
+target/
+!.mvn/wrapper/maven-wrapper.jar
+
+# Runtime state: the H2 database file and staged CSV uploads.
+data/
+
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
+
+*.log
+.DS_Store

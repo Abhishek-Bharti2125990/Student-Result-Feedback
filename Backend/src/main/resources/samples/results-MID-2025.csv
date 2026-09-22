@@ -1,0 +1,41 @@
+admission_no,exam_code,subject_code,marks_obtained,max_marks,attempted,remarks,topic_breakdown
+STU1001,MID-2025,MATH,71,100,true,Algebra still the weak area,Algebra:10/25|Geometry:21/25|Trigonometry:21/25|Statistics:19/25
+STU1002,MID-2025,MATH,95,100,true,,Algebra:24/25|Geometry:24/25|Trigonometry:24/25|Statistics:23/25
+STU1003,MID-2025,MATH,62,100,true,,Algebra:12/25|Geometry:17/25|Trigonometry:17/25|Statistics:16/25
+STU1004,MID-2025,MATH,64,100,true,,Algebra:12/25|Geometry:17/25|Trigonometry:18/25|Statistics:17/25
+STU1005,MID-2025,MATH,41,100,true,Improving but still below pass,Algebra:8/25|Geometry:11/25|Trigonometry:11/25|Statistics:11/25
+STU1006,MID-2025,MATH,88,100,true,,Algebra:21/25|Geometry:23/25|Trigonometry:22/25|Statistics:22/25
+STU1007,MID-2025,MATH,53,100,true,,Algebra:9/25|Geometry:15/25|Trigonometry:15/25|Statistics:14/25
+STU1008,MID-2025,MATH,79,100,true,,Algebra:17/25|Geometry:21/25|Trigonometry:21/25|Statistics:20/25
+STU1001,MID-2025,SCI,85,100,true,,Physics - Motion:21/25|Physics - Optics:22/25|Chemistry - Reactions:21/25|Biology - Life Processes:21/25
+STU1002,MID-2025,SCI,91,100,true,,Physics - Motion:23/25|Physics - Optics:23/25|Chemistry - Reactions:23/25|Biology - Life Processes:22/25
+STU1003,MID-2025,SCI,57,100,true,,Physics - Motion:11/25|Physics - Optics:15/25|Chemistry - Reactions:16/25|Biology - Life Processes:15/25
+STU1004,MID-2025,SCI,69,100,true,,Physics - Motion:15/25|Physics - Optics:18/25|Chemistry - Reactions:18/25|Biology - Life Processes:18/25
+STU1005,MID-2025,SCI,44,100,true,,Physics - Motion:8/25|Physics - Optics:12/25|Chemistry - Reactions:12/25|Biology - Life Processes:12/25
+STU1006,MID-2025,SCI,83,100,true,,Physics - Motion:20/25|Physics - Optics:21/25|Chemistry - Reactions:21/25|Biology - Life Processes:21/25
+STU1007,MID-2025,SCI,55,100,true,,Physics - Motion:11/25|Physics - Optics:15/25|Chemistry - Reactions:15/25|Biology - Life Processes:14/25
+STU1008,MID-2025,SCI,80,100,true,,Physics - Motion:19/25|Physics - Optics:21/25|Chemistry - Reactions:20/25|Biology - Life Processes:20/25
+STU1001,MID-2025,ENG,90,100,true,,
+STU1002,MID-2025,ENG,87,100,true,,
+STU1003,MID-2025,ENG,70,100,true,,
+STU1004,MID-2025,ENG,77,100,true,,
+STU1005,MID-2025,ENG,52,100,true,,
+STU1006,MID-2025,ENG,94,100,true,,
+STU1007,MID-2025,ENG,51,100,true,,
+STU1008,MID-2025,ENG,83,100,true,,
+STU1001,MID-2025,SOC,78,100,true,,
+STU1002,MID-2025,SOC,92,100,true,,
+STU1003,MID-2025,SOC,65,100,true,,
+STU1004,MID-2025,SOC,62,100,true,,
+STU1005,MID-2025,SOC,47,100,true,,
+STU1006,MID-2025,SOC,84,100,true,,
+STU1007,MID-2025,SOC,59,100,true,,
+STU1008,MID-2025,SOC,74,100,true,,
+STU1001,MID-2025,CS,94,100,true,,
+STU1002,MID-2025,CS,89,100,true,,
+STU1003,MID-2025,CS,76,100,true,,
+STU1004,MID-2025,CS,71,100,true,,
+STU1005,MID-2025,CS,43,100,true,,
+STU1006,MID-2025,CS,90,100,true,,
+STU1007,MID-2025,CS,64,100,true,,
+STU1008,MID-2025,CS,82,100,true,,
