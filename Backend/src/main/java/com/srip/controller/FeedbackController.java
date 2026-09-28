@@ -10,7 +10,11 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 /**
- * AI-generated feedback.
+ * AI-generated feedback for a named exam.
+ *
+ * <p>{@code /api/student/feedback} is the route a student client uses; these
+ * exist for the case where the exam matters - reading back last term's feedback
+ * rather than the latest.
  *
  * <p>Each route returns the stored document if one exists, so repeated reads
  * are free and everybody sees the same words. {@code ?refresh=true} forces
@@ -33,8 +37,6 @@ public class FeedbackController {
         this.accessGuard = accessGuard;
     }
 
-    // -- Student-facing ------------------------------------------------------
-
     @GetMapping("/student/{studentId}/exams/{examId}")
     public FeedbackEnvelope studentFeedback(@PathVariable Long studentId,
                                             @PathVariable Long examId,
@@ -47,16 +49,6 @@ public class FeedbackController {
     public FeedbackEnvelope myFeedback(@PathVariable Long examId,
                                        @RequestParam(defaultValue = "false") boolean refresh) {
         return feedback.studentFeedback(accessGuard.currentStudentIdOrFail(), examId, refresh);
-    }
-
-    // -- Parent-facing -------------------------------------------------------
-
-    @GetMapping("/parent/{studentId}/exams/{examId}")
-    public FeedbackEnvelope parentFeedback(@PathVariable Long studentId,
-                                           @PathVariable Long examId,
-                                           @RequestParam(defaultValue = "false") boolean refresh) {
-        accessGuard.assertCanReadStudent(studentId);
-        return feedback.parentFeedback(studentId, examId, refresh);
     }
 
     // -- Teacher-facing (TEACHER and ADMIN only, enforced by URL rule) -------

@@ -6,7 +6,7 @@ import java.time.Instant;
 import java.util.List;
 
 /**
- * The three feedback documents.
+ * The two feedback documents: one for the student, one for the teacher.
  *
  * <p>These records are also the JSON schema handed to Claude as a structured
  * output format, which is why every field carries a description: the schema is
@@ -28,14 +28,17 @@ public final class FeedbackDtos {
             @JsonPropertyDescription("Specific topic to work on, or 'General' if the whole subject")
             String topic,
 
-            @JsonPropertyDescription("One concrete action the student should take, e.g. 'Re-solve the 10 quadratic equations from chapter 4'")
+            @JsonPropertyDescription("One concrete action the student should take, e.g. 'Revise the NCERT chapter on Quadratic Equations and solve 20 practice questions daily'")
             String action,
 
             @JsonPropertyDescription("When to do it, e.g. 'Week 1' or 'Daily for 2 weeks'")
             String timeframe,
 
-            @JsonPropertyDescription("Suggested study hours per week for this item")
-            int weeklyHours
+            @JsonPropertyDescription("Minutes of study per day for this item, e.g. 30")
+            int dailyMinutes,
+
+            @JsonPropertyDescription("Title of a book or video from the supplied study resources, or null if none was supplied for this topic. Never invent one.")
+            String resource
     ) {
     }
 
@@ -63,10 +66,10 @@ public final class FeedbackDtos {
             @JsonPropertyDescription("Student name exactly as given in the input data")
             String studentName,
 
-            @JsonPropertyDescription("The specific concern, including the subject and the percentage")
+            @JsonPropertyDescription("The specific concern, including the subject or topic and the percentage")
             String concern,
 
-            @JsonPropertyDescription("One concrete action the teacher should take for this student")
+            @JsonPropertyDescription("One concrete action the teacher should take for this student, e.g. 'Conduct additional Mathematics practice sessions'")
             String suggestedAction,
 
             @JsonPropertyDescription("Priority: HIGH, MEDIUM or LOW")
@@ -81,46 +84,14 @@ public final class FeedbackDtos {
             @JsonPropertyDescription("The students needing attention, most urgent first")
             List<WeakStudentNote> weakStudents,
 
-            @JsonPropertyDescription("Three to five classroom-level intervention suggestions, e.g. re-teaching a topic the whole class failed")
+            @JsonPropertyDescription("Three to five classroom-level intervention suggestions, e.g. re-teaching a topic most of the class lost marks on")
             List<String> interventionSuggestions,
 
-            @JsonPropertyDescription("Three to five remedial recommendations: extra sessions, practice sets, peer pairing, parent contact")
+            @JsonPropertyDescription("Three to five remedial recommendations: remedial classes, worksheets, revision sessions, peer pairing")
             List<String> remedialRecommendations,
 
             @JsonPropertyDescription("Topics where the whole class underperformed and which should be re-taught")
             List<String> topicsToReteach
-    ) {
-    }
-
-    // -- Parent -------------------------------------------------------------
-
-    public record WeeklyGuidanceItem(
-            @JsonPropertyDescription("Which week this applies to, e.g. 'Week 1'")
-            String week,
-
-            @JsonPropertyDescription("What the child should focus on that week")
-            String focus,
-
-            @JsonPropertyDescription("What the parent should specifically do that week")
-            String parentAction
-    ) {
-    }
-
-    public record ParentFeedback(
-            @JsonPropertyDescription("Two or three sentences for the parent, in plain non-technical language, no jargon and no grade shaming")
-            String summary,
-
-            @JsonPropertyDescription("Four to six practical things the parent can do at home, each doable by a working parent")
-            List<String> homeSupportRecommendations,
-
-            @JsonPropertyDescription("A four-week guidance schedule")
-            List<WeeklyGuidanceItem> weeklyGuidance,
-
-            @JsonPropertyDescription("What is going well, so the conversation at home does not start with problems")
-            List<String> positivesToAcknowledge,
-
-            @JsonPropertyDescription("One short closing line of encouragement for the parent")
-            String encouragement
     ) {
     }
 

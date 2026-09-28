@@ -1,9 +1,11 @@
 package com.srip.controller;
 
 import com.srip.dto.analytics.AnalyticsDtos.ClassAnalytics;
+import com.srip.dto.analytics.AnalyticsDtos.ClassTopicWeakness;
 import com.srip.dto.analytics.AnalyticsDtos.ExamReport;
 import com.srip.dto.analytics.AnalyticsDtos.PerformanceTrend;
 import com.srip.dto.analytics.AnalyticsDtos.RankingEntry;
+import com.srip.dto.analytics.AnalyticsDtos.StrongTopic;
 import com.srip.dto.analytics.AnalyticsDtos.WeakSubject;
 import com.srip.dto.analytics.AnalyticsDtos.WeakTopic;
 import com.srip.dto.result.ResultDtos.ExamResultView;
@@ -21,14 +23,17 @@ import java.util.List;
 /**
  * Read endpoints for the analytics engine.
  *
+ * <p>These are the detail views behind the two dashboards: one exam, one
+ * student, one class. A client that only needs to draw a dashboard should use
+ * {@code /api/student/dashboard} or {@code /api/teacher/dashboard} instead.
+ *
  * <p>Every student-scoped route calls {@link AccessGuard} before doing any
  * work. The URL rules in {@code SecurityConfig} can say "an authenticated user
- * may call this", but only the guard can say "<em>this</em> parent may read
- * <em>this</em> child".
+ * may call this", but only the guard can say "<em>this</em> student may read
+ * <em>that</em> record".
  *
- * <p>The {@code /me/**} variants exist so a student or parent client never has
- * to know its own numeric id, which also removes the temptation to let the
- * client pass one.
+ * <p>The {@code /me/**} variants exist so a student client never has to know its
+ * own numeric id, which also removes the temptation to let the client pass one.
  */
 @RestController
 @RequestMapping("/api/analytics")
@@ -78,6 +83,12 @@ public class AnalyticsController {
         return analytics.weakTopicsOf(studentId);
     }
 
+    @GetMapping("/students/{studentId}/strong-topics")
+    public List<StrongTopic> strongTopics(@PathVariable Long studentId) {
+        accessGuard.assertCanReadStudent(studentId);
+        return analytics.strongTopicsOf(studentId);
+    }
+
     // -- The caller's own data -----------------------------------------------
 
     @GetMapping("/me/exams/{examId}/report")
@@ -105,6 +116,13 @@ public class AnalyticsController {
     @GetMapping("/class/{className}/exams/{examId}/rankings")
     public List<RankingEntry> rankings(@PathVariable String className, @PathVariable Long examId) {
         return classInsights.rankings(examId, className);
+    }
+
+    /** The topics the class as a whole lost marks on, most-affected first. */
+    @GetMapping("/class/{className}/exams/{examId}/weak-topics")
+    public List<ClassTopicWeakness> classWeakTopics(@PathVariable String className,
+                                                    @PathVariable Long examId) {
+        return classInsights.weakestTopics(examId, className);
     }
 
     /**

@@ -7,7 +7,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * Percentage and grade calculation.
+ * Percentage, grade and score-category calculation.
  *
  * <p>All arithmetic uses {@link BigDecimal} with an explicit scale. Marks are
  * money-like: a mark of 49.995 must not round its way across a pass boundary
@@ -55,6 +55,30 @@ public class GradingService {
                 .findFirst()
                 .map(GradingProperties.Band::points)
                 .orElse(BigDecimal.ZERO);
+    }
+
+    /**
+     * The score category for a percentage.
+     *
+     * <p>Bounds are exclusive upper limits, so a percentage sitting exactly on a
+     * boundary lands in the higher band: 50 is AVERAGE, not CRITICAL. That is how
+     * "50 to 70" reads to a teacher, and getting it the other way round would put
+     * a student who scraped the threshold on the intervention list.
+     */
+    public ScoreCategory category(BigDecimal percentage) {
+        BigDecimal value = percentage == null ? BigDecimal.ZERO : percentage;
+        GradingProperties.CategoryBounds bounds = properties.categoryBounds();
+
+        if (value.compareTo(bounds.criticalBelow()) < 0) {
+            return ScoreCategory.CRITICAL;
+        }
+        if (value.compareTo(bounds.averageBelow()) < 0) {
+            return ScoreCategory.AVERAGE;
+        }
+        if (value.compareTo(bounds.goodBelow()) < 0) {
+            return ScoreCategory.GOOD;
+        }
+        return ScoreCategory.EXCELLENT;
     }
 
     public boolean isPass(BigDecimal percentage) {

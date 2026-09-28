@@ -1,21 +1,24 @@
 package com.srip.config;
 
+import com.srip.batch.AiInsightGenerationTasklet;
+import com.srip.batch.AnalyticsGenerationTasklet;
 import com.srip.batch.CsvHeaderValidationTasklet;
-import com.srip.batch.ExamResultWriter;
+import com.srip.batch.ReferenceDataTasklet;
 import com.srip.batch.RejectedRowListener;
 import com.srip.batch.ResultCsvLineMapper;
 import com.srip.batch.ResultCsvRow;
 import com.srip.batch.ResultRowProcessor;
 import com.srip.batch.RowValidationException;
+import com.srip.batch.TopicResultRow;
+import com.srip.batch.TopicResultWriter;
 import com.srip.batch.UploadJobStatusListener;
-import com.srip.domain.ExamResult;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.core.job.builder.JobBuilder;
 import org.springframework.batch.core.launch.JobLauncher;
-import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.launch.support.TaskExecutorJobLauncher;
+import org.springframework.batch.core.repository.JobRepository;
 import org.springframework.batch.core.step.builder.StepBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.FlatFileParseException;
@@ -27,40 +30,57 @@ import org.springframework.core.task.SimpleAsyncTaskExecutor;
 import org.springframework.transaction.PlatformTransactionManager;
 
 /**
- * The CSV import job.
+ * The CSV import job: read, validate, calculate, save, analyse, advise.
  *
- * <p>Two steps, in order:
+ * <p>Five steps, in order:
  * <ol>
  *   <li>{@code validateCsvHeaderStep} - fails the whole job once if the columns
  *       are wrong, rather than rejecting every row for the same reason.</li>
+ *   <li>{@code prepareReferenceDataStep} - creates the students, exams, subjects
+ *       and topics the file names, and commits them before any row is
+ *       processed.</li>
  *   <li>{@code importResultsStep} - chunked read, validate, write, tolerating
- *       individual bad rows.</li>
+ *       individual bad rows. Percentages and grades are calculated here.</li>
+ *   <li>{@code generateAnalyticsStep} - ranks each class and stores every
+ *       affected student's standing.</li>
+ *   <li>{@code generateAiInsightsStep} - writes the student and teacher feedback
+ *       documents.</li>
  * </ol>
  *
  * <p>The import step is fault tolerant with an effectively unlimited skip
  * budget. That is the right trade for this data: a school file frequently has a
- * handful of unknown admission numbers or a blank mark, and importing the other
- * 890 rows while reporting the 10 failures is far more useful than rejecting
- * the file. Every skip is recorded, so nothing is lost silently.
+ * handful of blank marks or a mark above the paper total, and importing the
+ * other 890 rows while reporting the 10 failures is far more useful than
+ * rejecting the file. Every skip is recorded, so nothing is lost silently.
+ *
+ * <p>The three tasklet steps are deliberately <em>not</em> fault tolerant. Each
+ * is all-or-nothing by nature: half-created reference data, or analytics for
+ * half a class, would be worse than a failed job an operator can re-run.
  */
 @Configuration
 public class BatchConfig {
 
     /** Rows per transaction. Large enough to be efficient, small enough that a
      *  rollback caused by one bad row replays only a little work. */
-    private static final int CHUNK_SIZE = 50;
+    private static final int CHUNK_SIZE = 100;
 
     public static final String JOB_NAME = "resultImportJob";
 
     @Bean
     public Job resultImportJob(JobRepository jobRepository,
                                Step validateCsvHeaderStep,
+                               Step prepareReferenceDataStep,
                                Step importResultsStep,
+                               Step generateAnalyticsStep,
+                               Step generateAiInsightsStep,
                                UploadJobStatusListener statusListener) {
         return new JobBuilder(JOB_NAME, jobRepository)
                 .listener(statusListener)
                 .start(validateCsvHeaderStep)
+                .next(prepareReferenceDataStep)
                 .next(importResultsStep)
+                .next(generateAnalyticsStep)
+                .next(generateAiInsightsStep)
                 .build();
     }
 
@@ -74,14 +94,23 @@ public class BatchConfig {
     }
 
     @Bean
+    public Step prepareReferenceDataStep(JobRepository jobRepository,
+                                         PlatformTransactionManager transactionManager,
+                                         ReferenceDataTasklet tasklet) {
+        return new StepBuilder("prepareReferenceDataStep", jobRepository)
+                .tasklet(tasklet, transactionManager)
+                .build();
+    }
+
+    @Bean
     public Step importResultsStep(JobRepository jobRepository,
                                   PlatformTransactionManager transactionManager,
                                   FlatFileItemReader<ResultCsvRow> resultCsvReader,
                                   ResultRowProcessor processor,
-                                  ExamResultWriter writer,
+                                  TopicResultWriter writer,
                                   RejectedRowListener rejectedRowListener) {
         return new StepBuilder("importResultsStep", jobRepository)
-                .<ResultCsvRow, ExamResult>chunk(CHUNK_SIZE, transactionManager)
+                .<ResultCsvRow, TopicResultRow>chunk(CHUNK_SIZE, transactionManager)
                 .reader(resultCsvReader)
                 .processor(processor)
                 .writer(writer)
@@ -92,6 +121,24 @@ public class BatchConfig {
                 .skip(FlatFileParseException.class)
                 .skipLimit(Integer.MAX_VALUE)
                 .listener(rejectedRowListener)
+                .build();
+    }
+
+    @Bean
+    public Step generateAnalyticsStep(JobRepository jobRepository,
+                                      PlatformTransactionManager transactionManager,
+                                      AnalyticsGenerationTasklet tasklet) {
+        return new StepBuilder("generateAnalyticsStep", jobRepository)
+                .tasklet(tasklet, transactionManager)
+                .build();
+    }
+
+    @Bean
+    public Step generateAiInsightsStep(JobRepository jobRepository,
+                                       PlatformTransactionManager transactionManager,
+                                       AiInsightGenerationTasklet tasklet) {
+        return new StepBuilder("generateAiInsightsStep", jobRepository)
+                .tasklet(tasklet, transactionManager)
                 .build();
     }
 

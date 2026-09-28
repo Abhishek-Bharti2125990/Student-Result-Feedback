@@ -7,14 +7,15 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * Grade bands, bound from {@code app.grading.*}. Kept in configuration because
- * grading scales differ per board and per school year, and changing one should
- * not require a redeploy of compiled logic.
+ * Grade bands and score-category bounds, bound from {@code app.grading.*}. Kept
+ * in configuration because grading scales differ per board and per school year,
+ * and changing one should not require a redeploy of compiled logic.
  */
 @ConfigurationProperties(prefix = "app.grading")
 public record GradingProperties(
         List<Band> bands,
-        BigDecimal passPercentage
+        BigDecimal passPercentage,
+        CategoryBounds categoryBounds
 ) {
 
     /**
@@ -25,9 +26,32 @@ public record GradingProperties(
     public record Band(BigDecimal minPercentage, String grade, BigDecimal points) {
     }
 
+    /**
+     * Upper-exclusive bounds of the first three score categories; anything at or
+     * above {@code goodBelow} is EXCELLENT.
+     *
+     * @param criticalBelow a percentage under this is CRITICAL
+     * @param averageBelow  a percentage under this, but not CRITICAL, is AVERAGE
+     * @param goodBelow     a percentage under this, but not lower, is GOOD
+     */
+    public record CategoryBounds(
+            BigDecimal criticalBelow,
+            BigDecimal averageBelow,
+            BigDecimal goodBelow
+    ) {
+        public CategoryBounds {
+            criticalBelow = criticalBelow == null ? new BigDecimal("50") : criticalBelow;
+            averageBelow = averageBelow == null ? new BigDecimal("70") : averageBelow;
+            goodBelow = goodBelow == null ? new BigDecimal("85") : goodBelow;
+        }
+    }
+
     public GradingProperties {
         bands = (bands == null || bands.isEmpty()) ? defaultBands() : bands;
         passPercentage = passPercentage == null ? new BigDecimal("40") : passPercentage;
+        categoryBounds = categoryBounds == null
+                ? new CategoryBounds(null, null, null)
+                : categoryBounds;
         // Highest floor first, so the first match is the correct grade.
         bands = bands.stream()
                 .sorted(Comparator.comparing(Band::minPercentage).reversed())

@@ -8,7 +8,7 @@ import java.util.Optional;
 
 public interface AiFeedbackRepository extends JpaRepository<AiFeedback, Long> {
 
-    /** Most recent student- or parent-facing document, or empty if never generated. */
+    /** Most recent student-facing document, or empty if never generated. */
     Optional<AiFeedback> findFirstByStudentIdAndExamIdAndAudienceOrderByGeneratedAtDesc(
             Long studentId, Long examId, AiFeedback.Audience audience);
 

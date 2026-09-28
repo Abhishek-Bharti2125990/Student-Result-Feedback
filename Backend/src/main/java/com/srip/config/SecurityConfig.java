@@ -27,7 +27,7 @@ import java.util.List;
  * Stateless JWT security.
  *
  * <p>Coarse role rules live here so the whole access model can be read in one
- * place; row-level rules ("may this parent see this child?") cannot be
+ * place; row-level rules ("may this student see student 42?") cannot be
  * expressed by URL and live in {@code AccessGuard}, called from the services.
  */
 @Configuration
@@ -63,7 +63,8 @@ public class SecurityConfig {
                         .requestMatchers("/actuator/health", "/actuator/info").permitAll()
                         .requestMatchers("/h2-console/**").permitAll()
 
-                        // Only admins create accounts or manage reference data.
+                        // Only admins create accounts, upload results or manage
+                        // reference data.
                         .requestMatchers("/api/auth/register").hasRole("ADMIN")
                         .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
@@ -71,8 +72,14 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/uploads/**").hasAnyRole("TEACHER", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/uploads/**").hasAnyRole("TEACHER", "ADMIN")
 
-                        // Class-wide analytics are staff-only; a parent must not
-                        // see another family's child in a ranking table.
+                        // A student dashboard is scoped to the caller's own
+                        // record by AccessGuard, so staff are allowed here too -
+                        // a teacher looking at one student's card is legitimate.
+                        .requestMatchers("/api/student/**").hasAnyRole("STUDENT", "TEACHER", "ADMIN")
+
+                        // The teacher dashboard names every child in the class
+                        // and their weaknesses, so it is staff-only.
+                        .requestMatchers("/api/teacher/**").hasAnyRole("TEACHER", "ADMIN")
                         .requestMatchers("/api/analytics/class/**").hasAnyRole("TEACHER", "ADMIN")
                         .requestMatchers("/api/feedback/teacher/**").hasAnyRole("TEACHER", "ADMIN")
 

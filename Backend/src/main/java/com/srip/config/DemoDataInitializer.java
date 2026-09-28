@@ -1,13 +1,11 @@
 package com.srip.config;
 
-import com.srip.domain.ParentStudent;
 import com.srip.domain.Role;
 import com.srip.domain.Student;
 import com.srip.domain.Subject;
 import com.srip.domain.Teacher;
 import com.srip.domain.TeacherSubject;
 import com.srip.domain.UserAccount;
-import com.srip.repository.ParentStudentRepository;
 import com.srip.repository.StudentRepository;
 import com.srip.repository.SubjectRepository;
 import com.srip.repository.TeacherRepository;
@@ -40,7 +38,8 @@ public class DemoDataInitializer implements ApplicationRunner {
 
     private static final Logger log = LoggerFactory.getLogger(DemoDataInitializer.class);
 
-    private static final String DEMO_ADMISSION_NO = "STU1001";
+    /** Matches a student seeded by migration V2, and the sample CSV files. */
+    private static final String DEMO_STUDENT_ID = "1001";
     private static final String DEMO_STAFF_NO = "T-100";
     private static final String DEMO_CLASS = "10";
 
@@ -50,7 +49,6 @@ public class DemoDataInitializer implements ApplicationRunner {
     private final TeacherRepository teachers;
     private final SubjectRepository subjects;
     private final TeacherSubjectRepository teacherSubjects;
-    private final ParentStudentRepository parentLinks;
     private final PasswordEncoder passwordEncoder;
 
     public DemoDataInitializer(DemoProperties properties,
@@ -59,7 +57,6 @@ public class DemoDataInitializer implements ApplicationRunner {
                                TeacherRepository teachers,
                                SubjectRepository subjects,
                                TeacherSubjectRepository teacherSubjects,
-                               ParentStudentRepository parentLinks,
                                PasswordEncoder passwordEncoder) {
         this.properties = properties;
         this.users = users;
@@ -67,7 +64,6 @@ public class DemoDataInitializer implements ApplicationRunner {
         this.teachers = teachers;
         this.subjects = subjects;
         this.teacherSubjects = teacherSubjects;
-        this.parentLinks = parentLinks;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -82,7 +78,6 @@ public class DemoDataInitializer implements ApplicationRunner {
         created |= ensureAdmin();
         created |= ensureTeacher();
         created |= ensureStudent();
-        created |= ensureParent();
 
         if (created) {
             log.info("""
@@ -90,10 +85,9 @@ public class DemoDataInitializer implements ApplicationRunner {
                     Seeded demo logins (password: {})
                       admin    ADMIN
                       teacher1 TEACHER  (staff {})
-                      student1 STUDENT  (admission {})
-                      parent1  PARENT   (linked to {})
+                      student1 STUDENT  (student_id {})
                     Set app.demo.seed-users=false to stop creating these.
-                    """, properties.defaultPassword(), DEMO_STAFF_NO, DEMO_ADMISSION_NO, DEMO_ADMISSION_NO);
+                    """, properties.defaultPassword(), DEMO_STAFF_NO, DEMO_STUDENT_ID);
         }
     }
 
@@ -113,7 +107,7 @@ public class DemoDataInitializer implements ApplicationRunner {
                 new Teacher(account.get(), DEMO_STAFF_NO, "Priya Menon", "Mathematics"));
 
         // Give the demo teacher every class-10 subject so the class analytics
-        // and teacher feedback endpoints have something to return immediately.
+        // and teacher dashboard have something to return immediately.
         List<Subject> classSubjects = subjects.findAll().stream()
                 .filter(subject -> DEMO_CLASS.equals(subject.getClassName()))
                 .toList();
@@ -124,9 +118,9 @@ public class DemoDataInitializer implements ApplicationRunner {
     }
 
     private boolean ensureStudent() {
-        Optional<Student> student = students.findByAdmissionNo(DEMO_ADMISSION_NO);
+        Optional<Student> student = students.findByAdmissionNo(DEMO_STUDENT_ID);
         if (student.isEmpty()) {
-            log.warn("Student {} is missing, so no student login was created", DEMO_ADMISSION_NO);
+            log.warn("Student {} is missing, so no student login was created", DEMO_STUDENT_ID);
             return false;
         }
 
@@ -138,18 +132,6 @@ public class DemoDataInitializer implements ApplicationRunner {
 
         student.get().setUser(account.get());
         students.save(student.get());
-        return true;
-    }
-
-    private boolean ensureParent() {
-        Optional<UserAccount> account = createIfAbsent(
-                "parent1", "parent1@school.local", "Rahul Sharma", Role.PARENT);
-        if (account.isEmpty()) {
-            return false;
-        }
-
-        students.findByAdmissionNo(DEMO_ADMISSION_NO).ifPresent(student ->
-                parentLinks.save(new ParentStudent(account.get(), student, "FATHER")));
         return true;
     }
 

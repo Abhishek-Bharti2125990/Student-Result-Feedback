@@ -140,9 +140,8 @@ public class AuthService {
         switch (request.role()) {
             case STUDENT -> studentId = linkStudent(user, request);
             case TEACHER -> createTeacher(user, request);
-            case PARENT, ADMIN -> {
-                // A parent is linked to children separately, via the admin API;
-                // an admin needs no companion record.
+            case ADMIN -> {
+                // An admin needs no companion record.
             }
         }
 

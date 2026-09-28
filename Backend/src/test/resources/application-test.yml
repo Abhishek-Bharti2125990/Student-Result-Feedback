@@ -1,47 +1,32 @@
+# ---------------------------------------------------------------------------
+# Test profile: an in-memory H2 database, created and destroyed per JVM.
+#
+# Tests must not need a MySQL server, and must not leave rows behind in the
+# developer's own database. Flyway resolves {vendor} to `h2` here, so the tests
+# still run against the real migrations rather than a Hibernate-generated
+# approximation of them.
+# ---------------------------------------------------------------------------
 spring:
   datasource:
-    # In-memory for tests so a run never touches ./data or leaves state behind.
     url: jdbc:h2:mem:srip-test;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
     password: ""
 
-  jpa:
-    hibernate:
-      ddl-auto: none
-
-  flyway:
-    enabled: true
-    clean-disabled: false
-
-  batch:
-    jdbc:
-      # Flyway V3 owns the BATCH_* tables here too, so tests exercise the same
-      # schema path as a real run.
-      initialize-schema: never
-    job:
-      enabled: false
-
 app:
-  jwt:
-    secret: "test-only-signing-secret-that-is-long-enough-for-hs256"
-    issuer: srip-test
-    access-token-ttl: PT5M
-    refresh-token-ttl: PT1H
+  claude:
+    # No API key in tests: every feedback assertion runs against the local
+    # rule-based writer, which is deterministic and free.
+    api-key: ""
+    enabled: false
+    # Left on so the tests exercise the full six-step batch flow; with no API
+    # key the insight step runs the local writer, which costs nothing.
+    generate-on-import: true
 
   upload:
     directory: ./target/test-uploads
 
-  demo:
-    seed-users: true
-    default-password: "Passw0rd!"
-
-  claude:
-    # Blank on purpose: tests must never make a billed network call.
-    api-key: ""
-    enabled: false
-
 logging:
   level:
+    com.srip: INFO
     org.springframework.batch: WARN
-    org.hibernate: WARN

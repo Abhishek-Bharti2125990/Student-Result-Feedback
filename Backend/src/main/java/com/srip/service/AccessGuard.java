@@ -2,13 +2,11 @@ package com.srip.service;
 
 import com.srip.domain.Role;
 import com.srip.exception.ApiExceptions;
-import com.srip.repository.ParentStudentRepository;
 import com.srip.security.AppUserPrincipal;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * Row-level authorisation.
@@ -21,14 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Service
 public class AccessGuard {
 
-    private final ParentStudentRepository parentLinks;
-
-    public AccessGuard(ParentStudentRepository parentLinks) {
-        this.parentLinks = parentLinks;
-    }
-
     /** @throws AccessDeniedException if the current caller may not read this student */
-    @Transactional(readOnly = true)
     public void assertCanReadStudent(Long studentId) {
         AppUserPrincipal principal = currentPrincipal();
         Role role = principal.getRole();
@@ -40,11 +31,6 @@ public class AccessGuard {
             case STUDENT -> {
                 if (!studentId.equals(principal.getStudentId())) {
                     throw new AccessDeniedException("A student may only read their own results");
-                }
-            }
-            case PARENT -> {
-                if (!parentLinks.existsByParentIdAndStudentId(principal.getUserId(), studentId)) {
-                    throw new AccessDeniedException("This student is not linked to your account");
                 }
             }
         }

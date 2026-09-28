@@ -26,6 +26,11 @@ public class Student {
     @JoinColumn(name = "user_id", unique = true)
     private UserAccount user;
 
+    /**
+     * The school's own identifier for the student, and the {@code student_id}
+     * column of the upload. Results are loaded against this long before a login
+     * exists, so it - not the surrogate id - is what a CSV row resolves through.
+     */
     @Column(name = "admission_no", nullable = false, unique = true, length = 32)
     private String admissionNo;
 

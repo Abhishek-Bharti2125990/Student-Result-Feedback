@@ -15,7 +15,12 @@ public class Subject {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 16)
+    /**
+     * Slug of {@link #name}, e.g. {@code SOCIAL-SCIENCE}. The CSV names subjects
+     * rather than coding them, so the slug is what makes "Social Science" on two
+     * different lines resolve to one row.
+     */
+    @Column(nullable = false, unique = true, length = 32)
     private String code;
 
     @Column(nullable = false, length = 96)

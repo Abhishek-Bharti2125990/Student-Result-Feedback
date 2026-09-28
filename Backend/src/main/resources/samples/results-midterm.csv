@@ -1,0 +1,193 @@
+student_id,student_name,class_name,section,exam_name,subject,chapter_name,topic_name,marks_obtained,maximum_marks
+1001,Ayushman Sharma,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,10,25
+1001,Ayushman Sharma,10,A,Midterm,Mathematics,Algebra,Polynomials,17,25
+1001,Ayushman Sharma,10,A,Midterm,Mathematics,Geometry,Triangles,18,25
+1001,Ayushman Sharma,10,A,Midterm,Mathematics,Geometry,Circles,16,25
+1001,Ayushman Sharma,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,10,25
+1001,Ayushman Sharma,10,A,Midterm,Mathematics,Statistics,Statistics,17,25
+1001,Ayushman Sharma,10,A,Midterm,Science,Physics,Motion,23,25
+1001,Ayushman Sharma,10,A,Midterm,Science,Physics,Light,20,25
+1001,Ayushman Sharma,10,A,Midterm,Science,Physics,Electricity,22,25
+1001,Ayushman Sharma,10,A,Midterm,Science,Chemistry,Chemical Reactions,20,25
+1001,Ayushman Sharma,10,A,Midterm,Science,Chemistry,Acids and Bases,22,25
+1001,Ayushman Sharma,10,A,Midterm,Science,Biology,Life Processes,20,25
+1001,Ayushman Sharma,10,A,Midterm,English,Reading,Reading Comprehension,24,25
+1001,Ayushman Sharma,10,A,Midterm,English,Grammar,Grammar,22,25
+1001,Ayushman Sharma,10,A,Midterm,English,Writing,Writing Skills,23,25
+1001,Ayushman Sharma,10,A,Midterm,English,Literature,Literature,22,25
+1001,Ayushman Sharma,10,A,Midterm,Social Science,History,Nationalism,21,25
+1001,Ayushman Sharma,10,A,Midterm,Social Science,Geography,Resources,18,25
+1001,Ayushman Sharma,10,A,Midterm,Social Science,Civics,Democracy,20,25
+1001,Ayushman Sharma,10,A,Midterm,Social Science,Economics,Development,18,25
+1001,Ayushman Sharma,10,A,Midterm,Computer Science,Programming,Programming Basics,24,25
+1001,Ayushman Sharma,10,A,Midterm,Computer Science,Programming,Data Structures,22,25
+1001,Ayushman Sharma,10,A,Midterm,Computer Science,Databases,Databases,24,25
+1001,Ayushman Sharma,10,A,Midterm,Computer Science,Networking,Networking,22,25
+1002,Diya Patel,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,25,25
+1002,Diya Patel,10,A,Midterm,Mathematics,Algebra,Polynomials,23,25
+1002,Diya Patel,10,A,Midterm,Mathematics,Geometry,Triangles,24,25
+1002,Diya Patel,10,A,Midterm,Mathematics,Geometry,Circles,22,25
+1002,Diya Patel,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,25,25
+1002,Diya Patel,10,A,Midterm,Mathematics,Statistics,Statistics,23,25
+1002,Diya Patel,10,A,Midterm,Science,Physics,Motion,24,25
+1002,Diya Patel,10,A,Midterm,Science,Physics,Light,22,25
+1002,Diya Patel,10,A,Midterm,Science,Physics,Electricity,23,25
+1002,Diya Patel,10,A,Midterm,Science,Chemistry,Chemical Reactions,21,25
+1002,Diya Patel,10,A,Midterm,Science,Chemistry,Acids and Bases,24,25
+1002,Diya Patel,10,A,Midterm,Science,Biology,Life Processes,22,25
+1002,Diya Patel,10,A,Midterm,English,Reading,Reading Comprehension,23,25
+1002,Diya Patel,10,A,Midterm,English,Grammar,Grammar,21,25
+1002,Diya Patel,10,A,Midterm,English,Writing,Writing Skills,22,25
+1002,Diya Patel,10,A,Midterm,English,Literature,Literature,21,25
+1002,Diya Patel,10,A,Midterm,Social Science,History,Nationalism,24,25
+1002,Diya Patel,10,A,Midterm,Social Science,Geography,Resources,22,25
+1002,Diya Patel,10,A,Midterm,Social Science,Civics,Democracy,24,25
+1002,Diya Patel,10,A,Midterm,Social Science,Economics,Development,22,25
+1002,Diya Patel,10,A,Midterm,Computer Science,Programming,Programming Basics,23,25
+1002,Diya Patel,10,A,Midterm,Computer Science,Programming,Data Structures,21,25
+1002,Diya Patel,10,A,Midterm,Computer Science,Databases,Databases,23,25
+1002,Diya Patel,10,A,Midterm,Computer Science,Networking,Networking,21,25
+1003,Kabir Nair,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,10,25
+1003,Kabir Nair,10,A,Midterm,Mathematics,Algebra,Polynomials,14,25
+1003,Kabir Nair,10,A,Midterm,Mathematics,Geometry,Triangles,15,25
+1003,Kabir Nair,10,A,Midterm,Mathematics,Geometry,Circles,13,25
+1003,Kabir Nair,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,16,25
+1003,Kabir Nair,10,A,Midterm,Mathematics,Statistics,Statistics,14,25
+1003,Kabir Nair,10,A,Midterm,Science,Physics,Motion,15,25
+1003,Kabir Nair,10,A,Midterm,Science,Physics,Light,12,25
+1003,Kabir Nair,10,A,Midterm,Science,Physics,Electricity,14,25
+1003,Kabir Nair,10,A,Midterm,Science,Chemistry,Chemical Reactions,12,25
+1003,Kabir Nair,10,A,Midterm,Science,Chemistry,Acids and Bases,14,25
+1003,Kabir Nair,10,A,Midterm,Science,Biology,Life Processes,12,25
+1003,Kabir Nair,10,A,Midterm,English,Reading,Reading Comprehension,19,25
+1003,Kabir Nair,10,A,Midterm,English,Grammar,Grammar,16,25
+1003,Kabir Nair,10,A,Midterm,English,Writing,Writing Skills,18,25
+1003,Kabir Nair,10,A,Midterm,English,Literature,Literature,16,25
+1003,Kabir Nair,10,A,Midterm,Social Science,History,Nationalism,17,25
+1003,Kabir Nair,10,A,Midterm,Social Science,Geography,Resources,15,25
+1003,Kabir Nair,10,A,Midterm,Social Science,Civics,Democracy,16,25
+1003,Kabir Nair,10,A,Midterm,Social Science,Economics,Development,15,25
+1003,Kabir Nair,10,A,Midterm,Computer Science,Programming,Programming Basics,20,25
+1003,Kabir Nair,10,A,Midterm,Computer Science,Programming,Data Structures,18,25
+1003,Kabir Nair,10,A,Midterm,Computer Science,Databases,Databases,19,25
+1003,Kabir Nair,10,A,Midterm,Computer Science,Networking,Networking,18,25
+1004,Ishita Rao,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,20,25
+1004,Ishita Rao,10,A,Midterm,Mathematics,Algebra,Polynomials,17,25
+1004,Ishita Rao,10,A,Midterm,Mathematics,Geometry,Triangles,19,25
+1004,Ishita Rao,10,A,Midterm,Mathematics,Geometry,Circles,17,25
+1004,Ishita Rao,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,12,25
+1004,Ishita Rao,10,A,Midterm,Mathematics,Statistics,Statistics,17,25
+1004,Ishita Rao,10,A,Midterm,Science,Physics,Motion,20,25
+1004,Ishita Rao,10,A,Midterm,Science,Physics,Light,17,25
+1004,Ishita Rao,10,A,Midterm,Science,Physics,Electricity,19,25
+1004,Ishita Rao,10,A,Midterm,Science,Chemistry,Chemical Reactions,17,25
+1004,Ishita Rao,10,A,Midterm,Science,Chemistry,Acids and Bases,19,25
+1004,Ishita Rao,10,A,Midterm,Science,Biology,Life Processes,17,25
+1004,Ishita Rao,10,A,Midterm,English,Reading,Reading Comprehension,21,25
+1004,Ishita Rao,10,A,Midterm,English,Grammar,Grammar,19,25
+1004,Ishita Rao,10,A,Midterm,English,Writing,Writing Skills,21,25
+1004,Ishita Rao,10,A,Midterm,English,Literature,Literature,19,25
+1004,Ishita Rao,10,A,Midterm,Social Science,History,Nationalism,19,25
+1004,Ishita Rao,10,A,Midterm,Social Science,Geography,Resources,16,25
+1004,Ishita Rao,10,A,Midterm,Social Science,Civics,Democracy,18,25
+1004,Ishita Rao,10,A,Midterm,Social Science,Economics,Development,16,25
+1004,Ishita Rao,10,A,Midterm,Computer Science,Programming,Programming Basics,20,25
+1004,Ishita Rao,10,A,Midterm,Computer Science,Programming,Data Structures,18,25
+1004,Ishita Rao,10,A,Midterm,Computer Science,Databases,Databases,20,25
+1004,Ishita Rao,10,A,Midterm,Computer Science,Networking,Networking,18,25
+1005,Aman Verma,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,8,25
+1005,Aman Verma,10,A,Midterm,Mathematics,Algebra,Polynomials,11,25
+1005,Aman Verma,10,A,Midterm,Mathematics,Geometry,Triangles,13,25
+1005,Aman Verma,10,A,Midterm,Mathematics,Geometry,Circles,11,25
+1005,Aman Verma,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,13,25
+1005,Aman Verma,10,A,Midterm,Mathematics,Statistics,Statistics,11,25
+1005,Aman Verma,10,A,Midterm,Science,Physics,Motion,12,25
+1005,Aman Verma,10,A,Midterm,Science,Physics,Light,10,25
+1005,Aman Verma,10,A,Midterm,Science,Physics,Electricity,12,25
+1005,Aman Verma,10,A,Midterm,Science,Chemistry,Chemical Reactions,10,25
+1005,Aman Verma,10,A,Midterm,Science,Chemistry,Acids and Bases,12,25
+1005,Aman Verma,10,A,Midterm,Science,Biology,Life Processes,10,25
+1005,Aman Verma,10,A,Midterm,English,Reading,Reading Comprehension,14,25
+1005,Aman Verma,10,A,Midterm,English,Grammar,Grammar,11,25
+1005,Aman Verma,10,A,Midterm,English,Writing,Writing Skills,13,25
+1005,Aman Verma,10,A,Midterm,English,Literature,Literature,11,25
+1005,Aman Verma,10,A,Midterm,Social Science,History,Nationalism,13,25
+1005,Aman Verma,10,A,Midterm,Social Science,Geography,Resources,11,25
+1005,Aman Verma,10,A,Midterm,Social Science,Civics,Democracy,13,25
+1005,Aman Verma,10,A,Midterm,Social Science,Economics,Development,11,25
+1005,Aman Verma,10,A,Midterm,Computer Science,Programming,Programming Basics,12,25
+1005,Aman Verma,10,A,Midterm,Computer Science,Programming,Data Structures,10,25
+1005,Aman Verma,10,A,Midterm,Computer Science,Databases,Databases,11,25
+1005,Aman Verma,10,A,Midterm,Computer Science,Networking,Networking,10,25
+1006,Meera Krishnan,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,24,25
+1006,Meera Krishnan,10,A,Midterm,Mathematics,Algebra,Polynomials,22,25
+1006,Meera Krishnan,10,A,Midterm,Mathematics,Geometry,Triangles,23,25
+1006,Meera Krishnan,10,A,Midterm,Mathematics,Geometry,Circles,21,25
+1006,Meera Krishnan,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,24,25
+1006,Meera Krishnan,10,A,Midterm,Mathematics,Statistics,Statistics,22,25
+1006,Meera Krishnan,10,A,Midterm,Science,Physics,Motion,24,25
+1006,Meera Krishnan,10,A,Midterm,Science,Physics,Light,21,25
+1006,Meera Krishnan,10,A,Midterm,Science,Physics,Electricity,23,25
+1006,Meera Krishnan,10,A,Midterm,Science,Chemistry,Chemical Reactions,21,25
+1006,Meera Krishnan,10,A,Midterm,Science,Chemistry,Acids and Bases,23,25
+1006,Meera Krishnan,10,A,Midterm,Science,Biology,Life Processes,21,25
+1006,Meera Krishnan,10,A,Midterm,English,Reading,Reading Comprehension,25,25
+1006,Meera Krishnan,10,A,Midterm,English,Grammar,Grammar,22,25
+1006,Meera Krishnan,10,A,Midterm,English,Writing,Writing Skills,24,25
+1006,Meera Krishnan,10,A,Midterm,English,Literature,Literature,22,25
+1006,Meera Krishnan,10,A,Midterm,Social Science,History,Nationalism,24,25
+1006,Meera Krishnan,10,A,Midterm,Social Science,Geography,Resources,22,25
+1006,Meera Krishnan,10,A,Midterm,Social Science,Civics,Democracy,23,25
+1006,Meera Krishnan,10,A,Midterm,Social Science,Economics,Development,22,25
+1006,Meera Krishnan,10,A,Midterm,Computer Science,Programming,Programming Basics,24,25
+1006,Meera Krishnan,10,A,Midterm,Computer Science,Programming,Data Structures,22,25
+1006,Meera Krishnan,10,A,Midterm,Computer Science,Databases,Databases,24,25
+1006,Meera Krishnan,10,A,Midterm,Computer Science,Networking,Networking,22,25
+1007,Arjun Reddy,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,11,25
+1007,Arjun Reddy,10,A,Midterm,Mathematics,Algebra,Polynomials,15,25
+1007,Arjun Reddy,10,A,Midterm,Mathematics,Geometry,Triangles,17,25
+1007,Arjun Reddy,10,A,Midterm,Mathematics,Geometry,Circles,15,25
+1007,Arjun Reddy,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,12,25
+1007,Arjun Reddy,10,A,Midterm,Mathematics,Statistics,Statistics,15,25
+1007,Arjun Reddy,10,A,Midterm,Science,Physics,Motion,17,25
+1007,Arjun Reddy,10,A,Midterm,Science,Physics,Light,14,25
+1007,Arjun Reddy,10,A,Midterm,Science,Physics,Electricity,16,25
+1007,Arjun Reddy,10,A,Midterm,Science,Chemistry,Chemical Reactions,14,25
+1007,Arjun Reddy,10,A,Midterm,Science,Chemistry,Acids and Bases,16,25
+1007,Arjun Reddy,10,A,Midterm,Science,Biology,Life Processes,14,25
+1007,Arjun Reddy,10,A,Midterm,English,Reading,Reading Comprehension,16,25
+1007,Arjun Reddy,10,A,Midterm,English,Grammar,Grammar,13,25
+1007,Arjun Reddy,10,A,Midterm,English,Writing,Writing Skills,15,25
+1007,Arjun Reddy,10,A,Midterm,English,Literature,Literature,13,25
+1007,Arjun Reddy,10,A,Midterm,Social Science,History,Nationalism,18,25
+1007,Arjun Reddy,10,A,Midterm,Social Science,Geography,Resources,15,25
+1007,Arjun Reddy,10,A,Midterm,Social Science,Civics,Democracy,17,25
+1007,Arjun Reddy,10,A,Midterm,Social Science,Economics,Development,15,25
+1007,Arjun Reddy,10,A,Midterm,Computer Science,Programming,Programming Basics,19,25
+1007,Arjun Reddy,10,A,Midterm,Computer Science,Programming,Data Structures,17,25
+1007,Arjun Reddy,10,A,Midterm,Computer Science,Databases,Databases,19,25
+1007,Arjun Reddy,10,A,Midterm,Computer Science,Networking,Networking,17,25
+1008,Sara Fernandes,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,12,25
+1008,Sara Fernandes,10,A,Midterm,Mathematics,Algebra,Polynomials,18,25
+1008,Sara Fernandes,10,A,Midterm,Mathematics,Geometry,Triangles,20,25
+1008,Sara Fernandes,10,A,Midterm,Mathematics,Geometry,Circles,18,25
+1008,Sara Fernandes,10,A,Midterm,Mathematics,Trigonometry,Trigonometry,20,25
+1008,Sara Fernandes,10,A,Midterm,Mathematics,Statistics,Statistics,18,25
+1008,Sara Fernandes,10,A,Midterm,Science,Physics,Motion,21,25
+1008,Sara Fernandes,10,A,Midterm,Science,Physics,Light,19,25
+1008,Sara Fernandes,10,A,Midterm,Science,Physics,Electricity,21,25
+1008,Sara Fernandes,10,A,Midterm,Science,Chemistry,Chemical Reactions,19,25
+1008,Sara Fernandes,10,A,Midterm,Science,Chemistry,Acids and Bases,21,25
+1008,Sara Fernandes,10,A,Midterm,Science,Biology,Life Processes,19,25
+1008,Sara Fernandes,10,A,Midterm,English,Reading,Reading Comprehension,22,25
+1008,Sara Fernandes,10,A,Midterm,English,Grammar,Grammar,20,25
+1008,Sara Fernandes,10,A,Midterm,English,Writing,Writing Skills,22,25
+1008,Sara Fernandes,10,A,Midterm,English,Literature,Literature,20,25
+1008,Sara Fernandes,10,A,Midterm,Social Science,History,Nationalism,19,25
+1008,Sara Fernandes,10,A,Midterm,Social Science,Geography,Resources,17,25
+1008,Sara Fernandes,10,A,Midterm,Social Science,Civics,Democracy,19,25
+1008,Sara Fernandes,10,A,Midterm,Social Science,Economics,Development,17,25
+1008,Sara Fernandes,10,A,Midterm,Computer Science,Programming,Programming Basics,22,25
+1008,Sara Fernandes,10,A,Midterm,Computer Science,Programming,Data Structures,19,25
+1008,Sara Fernandes,10,A,Midterm,Computer Science,Databases,Databases,21,25
+1008,Sara Fernandes,10,A,Midterm,Computer Science,Networking,Networking,19,25

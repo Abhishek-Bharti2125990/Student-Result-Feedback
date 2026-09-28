@@ -16,8 +16,8 @@ class GradingServiceTest {
 
     @BeforeEach
     void setUp() {
-        // Null bands and pass mark exercise the configured defaults.
-        grading = new GradingService(new GradingProperties(null, null));
+        // Null bands, pass mark and category bounds exercise the defaults.
+        grading = new GradingService(new GradingProperties(null, null, null));
     }
 
     @Test
@@ -75,8 +75,52 @@ class GradingServiceTest {
                         new GradingProperties.Band(new BigDecimal("40"), "D", new BigDecimal("5")),
                         new GradingProperties.Band(new BigDecimal("90"), "A+", new BigDecimal("10")),
                         new GradingProperties.Band(BigDecimal.ZERO, "F", BigDecimal.ZERO)),
-                new BigDecimal("40"));
+                new BigDecimal("40"),
+                null);
 
         assertThat(new GradingService(shuffled).grade(new BigDecimal("95"))).isEqualTo("A+");
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "0,     CRITICAL",
+            "49.99, CRITICAL",
+            // On a boundary the higher band wins: "50 to 70" includes 50.
+            "50,    AVERAGE",
+            "69.99, AVERAGE",
+            "70,    GOOD",
+            "84.99, GOOD",
+            "85,    EXCELLENT",
+            "100,   EXCELLENT"
+    })
+    void scoreCategoryBoundariesFallIntoTheHigherBand(String percentage, ScoreCategory expected) {
+        assertThat(grading.category(new BigDecimal(percentage))).isEqualTo(expected);
+    }
+
+    @Test
+    void aMissingPercentageIsTreatedAsCriticalRatherThanThrowing() {
+        // A student with no marks recorded is the opposite of excellent, and a
+        // dashboard must still be able to place them somewhere.
+        assertThat(grading.category(null)).isEqualTo(ScoreCategory.CRITICAL);
+    }
+
+    @Test
+    void categoryBoundsAreConfigurable() {
+        GradingProperties strict = new GradingProperties(null, null,
+                new GradingProperties.CategoryBounds(
+                        new BigDecimal("60"), new BigDecimal("75"), new BigDecimal("90")));
+        GradingService strictGrading = new GradingService(strict);
+
+        assertThat(strictGrading.category(new BigDecimal("55"))).isEqualTo(ScoreCategory.CRITICAL);
+        assertThat(strictGrading.category(new BigDecimal("85"))).isEqualTo(ScoreCategory.GOOD);
+        assertThat(strictGrading.category(new BigDecimal("90"))).isEqualTo(ScoreCategory.EXCELLENT);
+    }
+
+    @Test
+    void everyCategoryCarriesTheHeadingTheDashboardsShow() {
+        assertThat(ScoreCategory.CRITICAL.label()).isEqualTo("Students Below 50%");
+        assertThat(ScoreCategory.AVERAGE.label()).isEqualTo("Students Between 50 and 70");
+        assertThat(ScoreCategory.GOOD.label()).isEqualTo("Students Between 70 and 85");
+        assertThat(ScoreCategory.EXCELLENT.label()).isEqualTo("Students Above 85");
     }
 }

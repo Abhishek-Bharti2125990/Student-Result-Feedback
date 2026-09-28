@@ -21,14 +21,12 @@ import java.util.List;
  *
  * <p>This runs as its own step so a file with the wrong columns fails once,
  * with one clear message, instead of producing a rejection for every single
- * row. Getting 900 identical "unknown subject_code" errors because the columns
- * were in the wrong order tells the uploader almost nothing.
+ * row. Getting 900 identical "marks_obtained must be a number" errors because
+ * the columns were in the wrong order tells the uploader almost nothing.
  */
 @Component
 @StepScope
 public class CsvHeaderValidationTasklet implements Tasklet {
-
-    private static final int REQUIRED_COLUMN_COUNT = ResultCsvLineMapper.REQUIRED_COLUMNS;
 
     private final Path filePath;
 
@@ -54,14 +52,12 @@ public class CsvHeaderValidationTasklet implements Tasklet {
                     .map(column -> column.replace("﻿", "").trim().toLowerCase())
                     .toList();
 
-            List<String> required = List.of(ResultCsvLineMapper.COLUMNS)
-                    .subList(0, REQUIRED_COLUMN_COUNT);
+            List<String> required = List.of(ResultCsvLineMapper.COLUMNS);
 
-            if (actual.size() < REQUIRED_COLUMN_COUNT || !actual.subList(0, REQUIRED_COLUMN_COUNT).equals(required)) {
+            if (!actual.equals(required)) {
                 throw new IllegalStateException(
-                        "Unexpected CSV header. The first %d columns must be exactly: %s. Found: %s"
-                                .formatted(REQUIRED_COLUMN_COUNT, String.join(", ", required),
-                                        String.join(", ", actual)));
+                        "Unexpected CSV header. The columns must be exactly: %s. Found: %s"
+                                .formatted(String.join(", ", required), String.join(", ", actual)));
             }
         }
 

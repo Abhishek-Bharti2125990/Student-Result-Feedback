@@ -2,18 +2,14 @@ spring:
   application:
     name: student-result-intelligence
 
-  # Local, file-backed SQL database. No server to install.
-  # To move to MySQL/PostgreSQL: swap url/driver/username/password only.
+  # MySQL is the platform database. Create the schema once:
+  #   CREATE DATABASE srip CHARACTER SET utf8mb4;
+  # Flyway then owns every table inside it.
   datasource:
-    url: jdbc:h2:file:./data/srip;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password: ""
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: ${DB_URL:jdbc:mysql://localhost:3306/srip?createDatabaseIfNotExist=true&serverTimezone=UTC&allowPublicKeyRetrieval=true&useSSL=false}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:root}
 
   jpa:
     open-in-view: false
@@ -30,14 +26,17 @@ spring:
 
   flyway:
     enabled: true
-    locations: classpath:db/migration
+    # {vendor} resolves to `mysql` or `h2` at runtime. The schema and the Spring
+    # Batch metadata tables cannot be written in one dialect that both accept -
+    # MySQL has no sequences and rejects TIMESTAMP(9) - so each vendor gets its
+    # own DDL, while the reference data in `common` is portable and shared.
+    locations: classpath:db/migration/common,classpath:db/migration/{vendor}
     baseline-on-migrate: true
 
   batch:
     jdbc:
       # The BATCH_* metadata tables are created by Flyway migration V3, not by
-      # Boot. Boot's `embedded` mode only recognises an in-memory H2 URL, so a
-      # file-backed database would silently start with no batch tables.
+      # Boot, so that they are version controlled alongside everything else.
       initialize-schema: never
     job:
       # Jobs are launched by the upload endpoint, never automatically at startup.
@@ -67,7 +66,7 @@ management:
 app:
   jwt:
     # CHANGE THIS. Must be at least 32 characters (256 bits) for HS256.
-    secret: "change-me-local-dev-secret-key-must-be-at-least-32-bytes-long"
+    secret: ${JWT_SECRET:change-me-local-dev-secret-key-must-be-at-least-32-bytes-long}
     issuer: srip
     access-token-ttl: PT30M
     refresh-token-ttl: P7D
@@ -88,10 +87,22 @@ app:
       - { min-percentage: 0,  grade: "F",  points: 0 }
     pass-percentage: 40
 
+    # Score categories used by the teacher dashboard:
+    #   CRITICAL  below 50
+    #   AVERAGE   50 to 70
+    #   GOOD      70 to 85
+    #   EXCELLENT above 85
+    category-bounds:
+      critical-below: 50
+      average-below: 70
+      good-below: 85
+
   analytics:
     # A subject/topic at or below this percentage is flagged weak.
     weak-subject-threshold: 50
     weak-topic-threshold: 50
+    # A subject/topic at or above this percentage is flagged strong.
+    strong-threshold: 75
     # Also flag a subject this many points below the student's own average.
     relative-weakness-margin: 15
     trend-min-exams: 2
@@ -105,6 +116,10 @@ app:
     max-tokens: 8000
     timeout: PT120S
     enabled: true
+    # Generate student and teacher feedback as the last step of a CSV import, so
+    # the dashboards are populated before anyone opens them. Turn this off if
+    # you would rather pay for a model call only when a dashboard is read.
+    generate-on-import: true
 
   demo:
     # Creates one login per role on first start (see README for credentials).

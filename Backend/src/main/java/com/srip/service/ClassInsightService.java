@@ -2,12 +2,17 @@ package com.srip.service;
 
 import com.srip.analytics.GradingService;
 import com.srip.analytics.RankingService;
+import com.srip.analytics.ScoreCategory;
 import com.srip.analytics.WeaknessDetector;
+import com.srip.config.AnalyticsProperties;
 import com.srip.config.CacheConfig;
 import com.srip.domain.Exam;
 import com.srip.domain.ExamResult;
 import com.srip.domain.Student;
+import com.srip.domain.Topic;
+import com.srip.dto.analytics.AnalyticsDtos.CategoryCount;
 import com.srip.dto.analytics.AnalyticsDtos.ClassAnalytics;
+import com.srip.dto.analytics.AnalyticsDtos.ClassTopicWeakness;
 import com.srip.dto.analytics.AnalyticsDtos.RankingEntry;
 import com.srip.dto.analytics.AnalyticsDtos.StrugglingStudent;
 import com.srip.dto.analytics.AnalyticsDtos.SubjectStat;
@@ -16,6 +21,8 @@ import com.srip.exception.ApiExceptions;
 import com.srip.repository.ExamRepository;
 import com.srip.repository.ExamResultRepository;
 import com.srip.repository.StudentRepository;
+import com.srip.repository.TopicRepository;
+import com.srip.repository.TopicScoreRepository;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
@@ -26,6 +33,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -34,7 +42,8 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Class-wide analytics: rankings and the teacher-facing exam overview.
+ * Class-wide analytics: rankings, score-category counts, the topics the whole
+ * class is losing marks on, and the teacher-facing exam overview.
  *
  * <p>These live in their own bean rather than on {@code AnalyticsService} for a
  * concrete reason: Spring's caching works through a proxy, so a cached method
@@ -48,25 +57,37 @@ import java.util.stream.Collectors;
 @Service
 public class ClassInsightService {
 
+    /** How many class-wide weak topics to surface; a longer list is not a plan. */
+    private static final int MAX_WEAK_TOPICS = 10;
+
     private final StudentRepository students;
     private final ExamRepository exams;
     private final ExamResultRepository examResults;
+    private final TopicScoreRepository topicScores;
+    private final TopicRepository topics;
     private final GradingService grading;
     private final RankingService ranking;
     private final WeaknessDetector weaknessDetector;
+    private final AnalyticsProperties analyticsProperties;
 
     public ClassInsightService(StudentRepository students,
                                ExamRepository exams,
                                ExamResultRepository examResults,
+                               TopicScoreRepository topicScores,
+                               TopicRepository topics,
                                GradingService grading,
                                RankingService ranking,
-                               WeaknessDetector weaknessDetector) {
+                               WeaknessDetector weaknessDetector,
+                               AnalyticsProperties analyticsProperties) {
         this.students = students;
         this.exams = exams;
         this.examResults = examResults;
+        this.topicScores = topicScores;
+        this.topics = topics;
         this.grading = grading;
         this.ranking = ranking;
         this.weaknessDetector = weaknessDetector;
+        this.analyticsProperties = analyticsProperties;
     }
 
     @Cacheable(cacheNames = CacheConfig.CACHE_RANKINGS, key = "#examId + ':' + #className")
@@ -99,6 +120,8 @@ public class ClassInsightService {
         List<RankingEntry> rankings = rankings(examId, className);
         List<SubjectStat> subjectStats = subjectStats(results);
         List<StrugglingStudent> struggling = strugglingStudents(results, rankings);
+        List<CategoryCount> categoryCounts = categoryCounts(rankings);
+        List<ClassTopicWeakness> weakestTopics = weakestTopics(examId, className);
 
         BigDecimal classAverage = average(rankings.stream().map(RankingEntry::percentage).toList());
         BigDecimal highest = rankings.isEmpty() ? BigDecimal.ZERO : rankings.get(0).percentage();
@@ -115,8 +138,10 @@ public class ClassInsightService {
                 classAverage,
                 highest,
                 lowest,
+                categoryCounts,
                 rankings,
                 subjectStats,
+                weakestTopics,
                 struggling);
     }
 
@@ -132,6 +157,54 @@ public class ClassInsightService {
     }
 
     /**
+     * The topics most of the class is losing marks on, worst first.
+     *
+     * <p>Ordered by how many students were weak on it rather than by the class
+     * average, because the number of affected students is what turns a private
+     * gap into a teaching issue: a topic 25 students failed needs a lesson, one
+     * that two students failed needs two conversations.
+     */
+    @Transactional(readOnly = true)
+    public List<ClassTopicWeakness> weakestTopics(Long examId, String className) {
+        List<TopicScoreRepository.TopicTally> tallies = topicScores.tallyTopicsForExamAndClass(
+                examId, className, analyticsProperties.weakTopicThreshold());
+        if (tallies.isEmpty()) {
+            return List.of();
+        }
+
+        Map<Long, Topic> topicsById = topics.findAllWithSubjectByIdIn(
+                        tallies.stream().map(TopicScoreRepository.TopicTally::getTopicId).toList())
+                .stream()
+                .collect(Collectors.toMap(Topic::getId, Function.identity()));
+
+        List<ClassTopicWeakness> weaknesses = new ArrayList<>();
+        for (TopicScoreRepository.TopicTally tally : tallies) {
+            long weakStudents = tally.getWeakStudents() == null ? 0L : tally.getWeakStudents();
+            if (weakStudents == 0) {
+                continue;
+            }
+            Topic topic = topicsById.get(tally.getTopicId());
+            if (topic == null) {
+                continue;
+            }
+            double average = tally.getAveragePercentage() == null ? 0d : tally.getAveragePercentage();
+            weaknesses.add(new ClassTopicWeakness(
+                    topic.getSubject().getCode(),
+                    topic.getSubject().getName(),
+                    topic.getChapterName(),
+                    topic.getName(),
+                    BigDecimal.valueOf(average).setScale(2, RoundingMode.HALF_UP),
+                    weakStudents));
+        }
+
+        weaknesses.sort(Comparator.comparingLong(ClassTopicWeakness::weakStudents).reversed()
+                .thenComparing(ClassTopicWeakness::classAveragePercentage));
+        return weaknesses.size() > MAX_WEAK_TOPICS
+                ? List.copyOf(weaknesses.subList(0, MAX_WEAK_TOPICS))
+                : List.copyOf(weaknesses);
+    }
+
+    /**
      * Called after a CSV import changes the marks behind these views. Without
      * it, a freshly uploaded exam would keep serving the previous rankings.
      */
@@ -141,6 +214,27 @@ public class ClassInsightService {
     })
     public void invalidateCaches() {
         // The annotations do the work; this method is the hook they hang on.
+    }
+
+    /**
+     * Counts per score category, in the enum's own order.
+     *
+     * <p>Every category is present even when empty: a dashboard that silently
+     * omits "Students Below 50%" when there are none looks broken, and a teacher
+     * cannot tell the difference between "nobody is failing" and "that panel did
+     * not load".
+     */
+    private List<CategoryCount> categoryCounts(List<RankingEntry> rankings) {
+        Map<ScoreCategory, Long> counts = new EnumMap<>(ScoreCategory.class);
+        for (ScoreCategory category : ScoreCategory.values()) {
+            counts.put(category, 0L);
+        }
+        for (RankingEntry entry : rankings) {
+            counts.merge(grading.category(entry.percentage()), 1L, Long::sum);
+        }
+        return counts.entrySet().stream()
+                .map(entry -> new CategoryCount(entry.getKey(), entry.getKey().label(), entry.getValue()))
+                .toList();
     }
 
     private List<SubjectStat> subjectStats(List<ExamResult> results) {
@@ -192,7 +286,7 @@ public class ClassInsightService {
                     student.getFullName(),
                     rankEntry.percentage(),
                     rankEntry.rank(),
-                    weak.stream().map(WeakSubject::subjectCode).toList()));
+                    weak.stream().map(WeakSubject::subjectName).toList()));
         }
         struggling.sort(Comparator.comparing(StrugglingStudent::overallPercentage));
         return struggling;

@@ -1,5 +1,7 @@
 package com.srip.dto.analytics;
 
+import com.srip.analytics.ScoreCategory;
+
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -32,6 +34,8 @@ public final class AnalyticsDtos {
 
     public record TopicPerformance(
             String subjectCode,
+            String subjectName,
+            String chapterName,
             String topicName,
             BigDecimal marksObtained,
             BigDecimal maxMarks,
@@ -54,6 +58,7 @@ public final class AnalyticsDtos {
             BigDecimal totalMaxMarks,
             BigDecimal overallPercentage,
             String overallGrade,
+            ScoreCategory category,
             boolean passed,
             int rankInClass,
             int classSize,
@@ -98,6 +103,20 @@ public final class AnalyticsDtos {
     ) {
     }
 
+    public record StrongSubject(
+            String subjectCode,
+            String subjectName,
+            BigDecimal averagePercentage
+    ) {
+    }
+
+    public record StrongTopic(
+            String subjectCode,
+            String topicName,
+            BigDecimal averagePercentage
+    ) {
+    }
+
     public record TrendPoint(
             String examCode,
             String examName,
@@ -135,16 +154,20 @@ public final class AnalyticsDtos {
             String studentName,
             String className,
             String section,
+            Long examId,
             String examCode,
             String examName,
             BigDecimal overallPercentage,
             String overallGrade,
+            ScoreCategory category,
             boolean passed,
             int rankInClass,
             int classSize,
             BigDecimal classAveragePercentage,
             List<SubjectPerformance> subjects,
+            List<StrongSubject> strongSubjects,
             List<WeakSubject> weakSubjects,
+            List<StrongTopic> strongTopics,
             List<WeakTopic> weakTopics,
             PerformanceTrend trend
     ) {
@@ -171,6 +194,26 @@ public final class AnalyticsDtos {
     ) {
     }
 
+    /** How many students of a class fell into one score category. */
+    public record CategoryCount(ScoreCategory category, String label, long students) {
+    }
+
+    /**
+     * A topic the class as a whole is losing marks on.
+     *
+     * @param weakStudents how many students in the class were weak on it; this is
+     *                     the number that turns a private gap into a teaching issue
+     */
+    public record ClassTopicWeakness(
+            String subjectCode,
+            String subjectName,
+            String chapterName,
+            String topicName,
+            BigDecimal classAveragePercentage,
+            long weakStudents
+    ) {
+    }
+
     /** Teacher-facing view of one exam for one class. */
     public record ClassAnalytics(
             Long examId,
@@ -181,8 +224,10 @@ public final class AnalyticsDtos {
             BigDecimal classAveragePercentage,
             BigDecimal highestPercentage,
             BigDecimal lowestPercentage,
+            List<CategoryCount> categoryCounts,
             List<RankingEntry> rankings,
             List<SubjectStat> subjectStats,
+            List<ClassTopicWeakness> weakestTopics,
             List<StrugglingStudent> strugglingStudents
     ) {
     }

@@ -11,6 +11,8 @@ import com.srip.domain.TopicScore;
 import com.srip.dto.analytics.AnalyticsDtos.ExamReport;
 import com.srip.dto.analytics.AnalyticsDtos.PerformanceTrend;
 import com.srip.dto.analytics.AnalyticsDtos.RankingEntry;
+import com.srip.dto.analytics.AnalyticsDtos.StrongSubject;
+import com.srip.dto.analytics.AnalyticsDtos.StrongTopic;
 import com.srip.dto.analytics.AnalyticsDtos.StudentSnapshot;
 import com.srip.dto.analytics.AnalyticsDtos.SubjectPerformance;
 import com.srip.dto.analytics.AnalyticsDtos.TopicPerformance;
@@ -34,7 +36,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
- * Per-student analytics: result cards, weakness detection and trends.
+ * Per-student analytics: result cards, strength and weakness detection, trends.
  *
  * <p>Class-wide aggregates are delegated to {@link ClassInsightService} so its
  * caching actually takes effect across the bean boundary.
@@ -113,6 +115,7 @@ public class AnalyticsService {
                 grading.scale(totalMax),
                 overallPercentage,
                 grading.grade(overallPercentage),
+                grading.category(overallPercentage),
                 grading.isPass(overallPercentage),
                 ranking.rankOf(rankings, studentId),
                 rankings.size(),
@@ -144,6 +147,7 @@ public class AnalyticsService {
                         result.getRemarks(),
                         scoresByResult.getOrDefault(result.getId(), List.of()).stream()
                                 .map(score -> new TopicScoreView(
+                                        score.getTopic().getChapterName(),
                                         score.getTopic().getName(),
                                         score.getMarksObtained(),
                                         score.getMaxMarks(),
@@ -172,6 +176,12 @@ public class AnalyticsService {
         return weaknessDetector.detectWeakTopics(topicScores.findAllForStudent(studentId));
     }
 
+    @Transactional(readOnly = true)
+    public List<StrongTopic> strongTopicsOf(Long studentId) {
+        requireStudent(studentId);
+        return weaknessDetector.detectStrongTopics(topicScores.findAllForStudent(studentId));
+    }
+
     // -- AI input ------------------------------------------------------------
 
     /**
@@ -180,15 +190,24 @@ public class AnalyticsService {
      * <p>Everything in it is computed, not generated, which is what makes the
      * feedback auditable: any claim in a generated document can be checked
      * against the snapshot the model was given.
+     *
+     * <p>Strengths and weaknesses are scoped to this exam's papers, while the
+     * trend spans the student's whole history. That is on purpose: advice about
+     * an exam should be about that exam, but "is this getting better or worse?"
+     * cannot be answered from one sitting.
      */
     @Transactional(readOnly = true)
     public StudentSnapshot snapshot(Long studentId, Long examId) {
         ExamReport report = examReport(studentId, examId);
 
-        List<WeakSubject> weakSubjects = weaknessDetector.detectWeakSubjects(
-                examResults.findForStudentAndExam(studentId, examId));
-        List<WeakTopic> weakTopics = weaknessDetector.detectWeakTopics(
-                topicScores.findAllForStudent(studentId));
+        List<ExamResult> examPapers = examResults.findForStudentAndExam(studentId, examId);
+        List<TopicScore> examTopics = topicScores.findForStudentAndExam(studentId, examId);
+
+        List<StrongSubject> strongSubjects = weaknessDetector.detectStrongSubjects(examPapers);
+        List<WeakSubject> weakSubjects = weaknessDetector.detectWeakSubjects(examPapers);
+        List<StrongTopic> strongTopics = weaknessDetector.detectStrongTopics(examTopics);
+        List<WeakTopic> weakTopics = weaknessDetector.detectWeakTopics(examTopics);
+
         PerformanceTrend trend = trendAnalyzer.analyse(examResults.findAllForStudent(studentId));
 
         BigDecimal classAverage = ClassInsightService.average(
@@ -202,16 +221,20 @@ public class AnalyticsService {
                 report.studentName(),
                 report.className(),
                 report.section(),
+                report.examId(),
                 report.examCode(),
                 report.examName(),
                 report.overallPercentage(),
                 report.overallGrade(),
+                report.category(),
                 report.passed(),
                 report.rankInClass(),
                 report.classSize(),
                 classAverage,
                 report.subjects(),
+                strongSubjects,
                 weakSubjects,
+                strongTopics,
                 weakTopics,
                 trend);
     }
@@ -238,6 +261,8 @@ public class AnalyticsService {
     private TopicPerformance toTopicPerformance(TopicScore score) {
         return new TopicPerformance(
                 score.getTopic().getSubject().getCode(),
+                score.getTopic().getSubject().getName(),
+                score.getTopic().getChapterName(),
                 score.getTopic().getName(),
                 score.getMarksObtained(),
                 score.getMaxMarks(),

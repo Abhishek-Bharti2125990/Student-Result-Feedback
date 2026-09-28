@@ -24,9 +24,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
  *
  * <p>Role checks are only half the story in a school system. The tests that
  * matter here are the row-level ones: one student must not be able to read
- * another's marks, and a parent must not be able to read a child who is not
- * theirs. Those cannot be expressed as URL rules, so they are what these tests
- * target.
+ * another's marks, however they ask. Those cannot be expressed as URL rules, so
+ * they are what these tests target.
  */
 @SpringBootTest
 @AutoConfigureMockMvc
@@ -34,6 +33,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class AuthAndAccessControlIntegrationTest {
 
     private static final String PASSWORD = "Passw0rd!";
+
+    private static final String CSV_HEADER =
+            "student_id,student_name,class_name,section,exam_name,subject,chapter_name,topic_name,marks_obtained,maximum_marks\n";
 
     @Autowired
     private MockMvc mockMvc;
@@ -53,7 +55,7 @@ class AuthAndAccessControlIntegrationTest {
                 .andExpect(jsonPath("$.tokenType").value("Bearer"))
                 .andExpect(jsonPath("$.user.role").value("STUDENT"))
                 // A student login resolves to a student record, which is what
-                // makes the /me endpoints possible.
+                // makes the dashboard endpoints possible without an id.
                 .andExpect(jsonPath("$.user.studentId").isNumber());
     }
 
@@ -88,7 +90,7 @@ class AuthAndAccessControlIntegrationTest {
     @Test
     void aStudentCannotReadAnotherStudentsResults() throws Exception {
         String token = accessToken("student1");
-        Long someoneElse = students.findByAdmissionNo("STU1002").orElseThrow().getId();
+        Long someoneElse = students.findByAdmissionNo("1002").orElseThrow().getId();
 
         mockMvc.perform(get("/api/analytics/students/{id}/results", someoneElse)
                         .header("Authorization", "Bearer " + token))
@@ -98,7 +100,7 @@ class AuthAndAccessControlIntegrationTest {
     @Test
     void aStudentCanReadTheirOwnResults() throws Exception {
         String token = accessToken("student1");
-        Long own = students.findByAdmissionNo("STU1001").orElseThrow().getId();
+        Long own = students.findByAdmissionNo("1001").orElseThrow().getId();
 
         mockMvc.perform(get("/api/analytics/students/{id}/results", own)
                         .header("Authorization", "Bearer " + token))
@@ -106,24 +108,26 @@ class AuthAndAccessControlIntegrationTest {
     }
 
     @Test
-    void aParentCanReadTheirLinkedChildButNotAnotherFamilysChild() throws Exception {
-        String token = accessToken("parent1");
-        Long linkedChild = students.findByAdmissionNo("STU1001").orElseThrow().getId();
-        Long otherChild = students.findByAdmissionNo("STU1003").orElseThrow().getId();
+    void aStudentCannotReachAnotherStudentsDashboardByPassingAnId() throws Exception {
+        // The dashboard takes studentId so staff can view one student's card.
+        // That parameter must not become a way around the row-level check.
+        Long someoneElse = students.findByAdmissionNo("1003").orElseThrow().getId();
 
-        mockMvc.perform(get("/api/analytics/students/{id}/results", linkedChild)
-                        .header("Authorization", "Bearer " + token))
-                .andExpect(status().isOk());
+        mockMvc.perform(get("/api/student/dashboard")
+                        .param("studentId", String.valueOf(someoneElse))
+                        .header("Authorization", "Bearer " + accessToken("student1")))
+                .andExpect(status().isForbidden());
 
-        mockMvc.perform(get("/api/analytics/students/{id}/results", otherChild)
-                        .header("Authorization", "Bearer " + token))
+        mockMvc.perform(get("/api/student/resources")
+                        .param("studentId", String.valueOf(someoneElse))
+                        .header("Authorization", "Bearer " + accessToken("student1")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void aTeacherCanReadAnyStudentInTheSchool() throws Exception {
         String token = accessToken("teacher1");
-        Long anyStudent = students.findByAdmissionNo("STU1003").orElseThrow().getId();
+        Long anyStudent = students.findByAdmissionNo("1003").orElseThrow().getId();
 
         mockMvc.perform(get("/api/analytics/students/{id}/results", anyStudent)
                         .header("Authorization", "Bearer " + token))
@@ -131,22 +135,40 @@ class AuthAndAccessControlIntegrationTest {
     }
 
     @Test
-    void classWideAnalyticsAreClosedToStudentsAndParents() throws Exception {
+    void theTeacherDashboardIsClosedToStudents() throws Exception {
+        // Every panel of it names other children and their weaknesses.
+        String studentToken = accessToken("student1");
+
+        mockMvc.perform(get("/api/teacher/dashboard")
+                        .header("Authorization", "Bearer " + studentToken))
+                .andExpect(status().isForbidden());
+
+        mockMvc.perform(get("/api/teacher/students/critical")
+                        .header("Authorization", "Bearer " + studentToken))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void classWideAnalyticsAreClosedToStudents() throws Exception {
         // A ranking table names every child in the class, so it is staff-only.
         mockMvc.perform(get("/api/analytics/class/10/exams/1/rankings")
                         .header("Authorization", "Bearer " + accessToken("student1")))
-                .andExpect(status().isForbidden());
-
-        mockMvc.perform(get("/api/analytics/class/10/exams/1/rankings")
-                        .header("Authorization", "Bearer " + accessToken("parent1")))
                 .andExpect(status().isForbidden());
     }
 
     @Test
     void onlyStaffCanUploadResults() throws Exception {
         mockMvc.perform(multipart("/api/uploads")
-                        .file("file", "admission_no,exam_code\n".getBytes())
+                        .file("file", CSV_HEADER.getBytes())
                         .header("Authorization", "Bearer " + accessToken("student1")))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void theAdminUploadRouteIsAdminOnly() throws Exception {
+        mockMvc.perform(multipart("/api/admin/upload")
+                        .file("file", CSV_HEADER.getBytes())
+                        .header("Authorization", "Bearer " + accessToken("teacher1")))
                 .andExpect(status().isForbidden());
     }
 
@@ -154,7 +176,7 @@ class AuthAndAccessControlIntegrationTest {
     void onlyAnAdminCanCreateAccounts() throws Exception {
         String body = """
                 {"username":"nope","email":"nope@school.local","password":"Passw0rd!",
-                 "fullName":"No One","role":"STUDENT","admissionNo":"STU1004"}
+                 "fullName":"No One","role":"STUDENT","admissionNo":"1004"}
                 """;
 
         mockMvc.perform(post("/api/auth/register")
@@ -162,6 +184,22 @@ class AuthAndAccessControlIntegrationTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(body))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void theParentRoleNoLongerExists() throws Exception {
+        // Only three roles are supported. A request naming a fourth must be
+        // rejected as malformed rather than quietly creating something.
+        String body = """
+                {"username":"aparent","email":"parent@school.local","password":"Passw0rd!",
+                 "fullName":"A Parent","role":"PARENT"}
+                """;
+
+        mockMvc.perform(post("/api/auth/register")
+                        .header("Authorization", "Bearer " + accessToken("admin"))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(body))
+                .andExpect(status().isBadRequest());
     }
 
     @Test
@@ -213,14 +251,6 @@ class AuthAndAccessControlIntegrationTest {
     }
 
     @Test
-    void aParentCanListTheirOwnChildren() throws Exception {
-        mockMvc.perform(get("/api/reference/my-children")
-                        .header("Authorization", "Bearer " + accessToken("parent1")))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].admissionNo").value("STU1001"));
-    }
-
-    @Test
     void aStudentCannotListTheClassRoster() throws Exception {
         mockMvc.perform(get("/api/reference/students")
                         .header("Authorization", "Bearer " + accessToken("student1")))
@@ -232,7 +262,18 @@ class AuthAndAccessControlIntegrationTest {
         mockMvc.perform(get("/api/reference/exams")
                         .header("Authorization", "Bearer " + accessToken("student1")))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].code").value("UT1-2025"));
+                .andExpect(jsonPath("$[0].code").value("UNIT-TEST-1"));
+    }
+
+    @Test
+    void theStudyResourceLibraryIsReadableByAStudent() throws Exception {
+        // It contains no personal data, and it is what a weak-topic
+        // recommendation links to.
+        mockMvc.perform(get("/api/reference/study-resources")
+                        .param("subject", "Mathematics")
+                        .header("Authorization", "Bearer " + accessToken("student1")))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].subject").value("Mathematics"));
     }
 
     // -- Helpers -------------------------------------------------------------

@@ -15,7 +15,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class RankingServiceTest {
 
     private final RankingService ranking =
-            new RankingService(new GradingService(new GradingProperties(null, null)));
+            new RankingService(new GradingService(new GradingProperties(null, null, null)));
 
     @Test
     void ranksByPercentageDescending() {

@@ -4,7 +4,6 @@ import org.springframework.batch.item.file.LineMapper;
 import org.springframework.batch.item.file.transform.DelimitedLineTokenizer;
 import org.springframework.batch.item.file.transform.FieldSet;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -24,32 +23,30 @@ import java.util.List;
  *
  * <p>Expected header:
  * <pre>
- * admission_no,exam_code,subject_code,marks_obtained,max_marks,attempted,remarks,topic_breakdown
+ * student_id,student_name,class_name,section,exam_name,subject,chapter_name,topic_name,marks_obtained,maximum_marks
  * </pre>
- * The last three columns are optional. {@code topic_breakdown} uses
- * {@code Topic:got/max} entries separated by {@code |}, for example
- * {@code Algebra:18/25|Geometry:20/25}.
+ * Every column must be present. {@code section} is the only one allowed to be
+ * empty, for a class that is not divided into sections.
  */
 public class ResultCsvLineMapper implements LineMapper<ResultCsvRow> {
 
     static final String[] COLUMNS = {
-            "admission_no", "exam_code", "subject_code",
-            "marks_obtained", "max_marks", "attempted", "remarks", "topic_breakdown"
+            "student_id", "student_name", "class_name", "section", "exam_name",
+            "subject", "chapter_name", "topic_name", "marks_obtained", "maximum_marks"
     };
 
-    /** Everything up to and including {@code max_marks} must be present. */
-    static final int REQUIRED_COLUMNS = 5;
+    static final int COLUMN_COUNT = COLUMNS.length;
 
-    private static final int IDX_ADMISSION_NO = 0;
-    private static final int IDX_EXAM_CODE = 1;
-    private static final int IDX_SUBJECT_CODE = 2;
-    private static final int IDX_MARKS = 3;
-    private static final int IDX_MAX_MARKS = 4;
-    private static final int IDX_ATTEMPTED = 5;
-    private static final int IDX_REMARKS = 6;
-    private static final int IDX_TOPICS = 7;
-
-    private static final String TOPIC_SEPARATOR = "\\|";
+    private static final int IDX_STUDENT_ID = 0;
+    private static final int IDX_STUDENT_NAME = 1;
+    private static final int IDX_CLASS_NAME = 2;
+    private static final int IDX_SECTION = 3;
+    private static final int IDX_EXAM_NAME = 4;
+    private static final int IDX_SUBJECT = 5;
+    private static final int IDX_CHAPTER_NAME = 6;
+    private static final int IDX_TOPIC_NAME = 7;
+    private static final int IDX_MARKS = 8;
+    private static final int IDX_MAX_MARKS = 9;
 
     private final DelimitedLineTokenizer tokenizer = new DelimitedLineTokenizer();
 
@@ -57,57 +54,26 @@ public class ResultCsvLineMapper implements LineMapper<ResultCsvRow> {
     public ResultCsvRow mapLine(String line, int lineNumber) {
         FieldSet fields = tokenizer.tokenize(line);
 
-        if (fields.getFieldCount() < REQUIRED_COLUMNS) {
+        if (fields.getFieldCount() < COLUMN_COUNT) {
             throw new RowValidationException(lineNumber, line,
-                    "Expected at least %d columns (%s) but found %d"
-                            .formatted(REQUIRED_COLUMNS, String.join(", ", requiredColumnNames()),
+                    "Expected %d columns (%s) but found %d"
+                            .formatted(COLUMN_COUNT, String.join(", ", List.of(COLUMNS)),
                                     fields.getFieldCount()));
         }
 
         return new ResultCsvRow(
                 lineNumber,
                 line,
-                at(fields, IDX_ADMISSION_NO),
-                at(fields, IDX_EXAM_CODE),
-                at(fields, IDX_SUBJECT_CODE),
+                at(fields, IDX_STUDENT_ID),
+                at(fields, IDX_STUDENT_NAME),
+                at(fields, IDX_CLASS_NAME),
+                at(fields, IDX_SECTION),
+                at(fields, IDX_EXAM_NAME),
+                at(fields, IDX_SUBJECT),
+                at(fields, IDX_CHAPTER_NAME),
+                at(fields, IDX_TOPIC_NAME),
                 at(fields, IDX_MARKS),
-                at(fields, IDX_MAX_MARKS),
-                at(fields, IDX_ATTEMPTED),
-                at(fields, IDX_REMARKS),
-                parseTopics(lineNumber, line, at(fields, IDX_TOPICS)));
-    }
-
-    /**
-     * @return the topic entries, or an empty list when the column is absent;
-     *         subject-level marks alone are a valid upload
-     */
-    private List<ResultCsvRow.TopicMark> parseTopics(int lineNumber, String line, String raw) {
-        if (raw == null || raw.isBlank()) {
-            return List.of();
-        }
-
-        List<ResultCsvRow.TopicMark> topics = new ArrayList<>();
-        for (String entry : raw.split(TOPIC_SEPARATOR)) {
-            String trimmed = entry.trim();
-            if (trimmed.isEmpty()) {
-                continue;
-            }
-
-            // Split on the last colon and last slash so topic names may
-            // themselves contain punctuation, e.g. "Physics - Optics".
-            int colon = trimmed.lastIndexOf(':');
-            int slash = trimmed.lastIndexOf('/');
-            if (colon <= 0 || slash <= colon + 1 || slash == trimmed.length() - 1) {
-                throw new RowValidationException(lineNumber, line,
-                        "Malformed topic_breakdown entry '%s'; expected Topic:got/max".formatted(trimmed));
-            }
-
-            topics.add(new ResultCsvRow.TopicMark(
-                    trimmed.substring(0, colon).trim(),
-                    trimmed.substring(colon + 1, slash).trim(),
-                    trimmed.substring(slash + 1).trim()));
-        }
-        return topics;
+                at(fields, IDX_MAX_MARKS));
     }
 
     /** @return the trimmed field at {@code index}, or null if absent or blank */
@@ -117,9 +83,5 @@ public class ResultCsvLineMapper implements LineMapper<ResultCsvRow> {
         }
         String value = fields.readString(index);
         return value == null || value.isBlank() ? null : value.trim();
-    }
-
-    private static List<String> requiredColumnNames() {
-        return List.of(COLUMNS).subList(0, REQUIRED_COLUMNS);
     }
 }

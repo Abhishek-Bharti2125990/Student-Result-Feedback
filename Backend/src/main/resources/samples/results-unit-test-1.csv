@@ -1,0 +1,193 @@
+student_id,student_name,class_name,section,exam_name,subject,chapter_name,topic_name,marks_obtained,maximum_marks
+1001,Ayushman Sharma,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,10,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,19,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Mathematics,Geometry,Triangles,20,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Mathematics,Geometry,Circles,18,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,11,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Mathematics,Statistics,Statistics,19,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Science,Physics,Motion,22,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Science,Physics,Light,20,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Science,Physics,Electricity,21,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,19,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,22,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Science,Biology,Life Processes,20,25
+1001,Ayushman Sharma,10,A,Unit Test 1,English,Reading,Reading Comprehension,23,25
+1001,Ayushman Sharma,10,A,Unit Test 1,English,Grammar,Grammar,21,25
+1001,Ayushman Sharma,10,A,Unit Test 1,English,Writing,Writing Skills,23,25
+1001,Ayushman Sharma,10,A,Unit Test 1,English,Literature,Literature,21,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Social Science,History,Nationalism,20,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Social Science,Geography,Resources,18,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Social Science,Civics,Democracy,20,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Social Science,Economics,Development,18,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,24,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Computer Science,Programming,Data Structures,22,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Computer Science,Databases,Databases,24,25
+1001,Ayushman Sharma,10,A,Unit Test 1,Computer Science,Networking,Networking,22,25
+1002,Diya Patel,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,25,25
+1002,Diya Patel,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,22,25
+1002,Diya Patel,10,A,Unit Test 1,Mathematics,Geometry,Triangles,24,25
+1002,Diya Patel,10,A,Unit Test 1,Mathematics,Geometry,Circles,22,25
+1002,Diya Patel,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,24,25
+1002,Diya Patel,10,A,Unit Test 1,Mathematics,Statistics,Statistics,22,25
+1002,Diya Patel,10,A,Unit Test 1,Science,Physics,Motion,24,25
+1002,Diya Patel,10,A,Unit Test 1,Science,Physics,Light,21,25
+1002,Diya Patel,10,A,Unit Test 1,Science,Physics,Electricity,23,25
+1002,Diya Patel,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,21,25
+1002,Diya Patel,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,23,25
+1002,Diya Patel,10,A,Unit Test 1,Science,Biology,Life Processes,21,25
+1002,Diya Patel,10,A,Unit Test 1,English,Reading,Reading Comprehension,22,25
+1002,Diya Patel,10,A,Unit Test 1,English,Grammar,Grammar,20,25
+1002,Diya Patel,10,A,Unit Test 1,English,Writing,Writing Skills,22,25
+1002,Diya Patel,10,A,Unit Test 1,English,Literature,Literature,20,25
+1002,Diya Patel,10,A,Unit Test 1,Social Science,History,Nationalism,24,25
+1002,Diya Patel,10,A,Unit Test 1,Social Science,Geography,Resources,22,25
+1002,Diya Patel,10,A,Unit Test 1,Social Science,Civics,Democracy,23,25
+1002,Diya Patel,10,A,Unit Test 1,Social Science,Economics,Development,22,25
+1002,Diya Patel,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,23,25
+1002,Diya Patel,10,A,Unit Test 1,Computer Science,Programming,Data Structures,21,25
+1002,Diya Patel,10,A,Unit Test 1,Computer Science,Databases,Databases,22,25
+1002,Diya Patel,10,A,Unit Test 1,Computer Science,Networking,Networking,21,25
+1003,Kabir Nair,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,10,25
+1003,Kabir Nair,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,13,25
+1003,Kabir Nair,10,A,Unit Test 1,Mathematics,Geometry,Triangles,15,25
+1003,Kabir Nair,10,A,Unit Test 1,Mathematics,Geometry,Circles,13,25
+1003,Kabir Nair,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,15,25
+1003,Kabir Nair,10,A,Unit Test 1,Mathematics,Statistics,Statistics,13,25
+1003,Kabir Nair,10,A,Unit Test 1,Science,Physics,Motion,14,25
+1003,Kabir Nair,10,A,Unit Test 1,Science,Physics,Light,11,25
+1003,Kabir Nair,10,A,Unit Test 1,Science,Physics,Electricity,13,25
+1003,Kabir Nair,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,11,25
+1003,Kabir Nair,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,13,25
+1003,Kabir Nair,10,A,Unit Test 1,Science,Biology,Life Processes,11,25
+1003,Kabir Nair,10,A,Unit Test 1,English,Reading,Reading Comprehension,18,25
+1003,Kabir Nair,10,A,Unit Test 1,English,Grammar,Grammar,16,25
+1003,Kabir Nair,10,A,Unit Test 1,English,Writing,Writing Skills,18,25
+1003,Kabir Nair,10,A,Unit Test 1,English,Literature,Literature,16,25
+1003,Kabir Nair,10,A,Unit Test 1,Social Science,History,Nationalism,16,25
+1003,Kabir Nair,10,A,Unit Test 1,Social Science,Geography,Resources,14,25
+1003,Kabir Nair,10,A,Unit Test 1,Social Science,Civics,Democracy,16,25
+1003,Kabir Nair,10,A,Unit Test 1,Social Science,Economics,Development,14,25
+1003,Kabir Nair,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,19,25
+1003,Kabir Nair,10,A,Unit Test 1,Computer Science,Programming,Data Structures,17,25
+1003,Kabir Nair,10,A,Unit Test 1,Computer Science,Databases,Databases,19,25
+1003,Kabir Nair,10,A,Unit Test 1,Computer Science,Networking,Networking,17,25
+1004,Ishita Rao,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,19,25
+1004,Ishita Rao,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,16,25
+1004,Ishita Rao,10,A,Unit Test 1,Mathematics,Geometry,Triangles,18,25
+1004,Ishita Rao,10,A,Unit Test 1,Mathematics,Geometry,Circles,16,25
+1004,Ishita Rao,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,12,25
+1004,Ishita Rao,10,A,Unit Test 1,Mathematics,Statistics,Statistics,16,25
+1004,Ishita Rao,10,A,Unit Test 1,Science,Physics,Motion,19,25
+1004,Ishita Rao,10,A,Unit Test 1,Science,Physics,Light,17,25
+1004,Ishita Rao,10,A,Unit Test 1,Science,Physics,Electricity,19,25
+1004,Ishita Rao,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,17,25
+1004,Ishita Rao,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,19,25
+1004,Ishita Rao,10,A,Unit Test 1,Science,Biology,Life Processes,17,25
+1004,Ishita Rao,10,A,Unit Test 1,English,Reading,Reading Comprehension,21,25
+1004,Ishita Rao,10,A,Unit Test 1,English,Grammar,Grammar,19,25
+1004,Ishita Rao,10,A,Unit Test 1,English,Writing,Writing Skills,21,25
+1004,Ishita Rao,10,A,Unit Test 1,English,Literature,Literature,19,25
+1004,Ishita Rao,10,A,Unit Test 1,Social Science,History,Nationalism,18,25
+1004,Ishita Rao,10,A,Unit Test 1,Social Science,Geography,Resources,16,25
+1004,Ishita Rao,10,A,Unit Test 1,Social Science,Civics,Democracy,17,25
+1004,Ishita Rao,10,A,Unit Test 1,Social Science,Economics,Development,16,25
+1004,Ishita Rao,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,20,25
+1004,Ishita Rao,10,A,Unit Test 1,Computer Science,Programming,Data Structures,18,25
+1004,Ishita Rao,10,A,Unit Test 1,Computer Science,Databases,Databases,19,25
+1004,Ishita Rao,10,A,Unit Test 1,Computer Science,Networking,Networking,18,25
+1005,Aman Verma,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,7,25
+1005,Aman Verma,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,10,25
+1005,Aman Verma,10,A,Unit Test 1,Mathematics,Geometry,Triangles,12,25
+1005,Aman Verma,10,A,Unit Test 1,Mathematics,Geometry,Circles,10,25
+1005,Aman Verma,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,12,25
+1005,Aman Verma,10,A,Unit Test 1,Mathematics,Statistics,Statistics,10,25
+1005,Aman Verma,10,A,Unit Test 1,Science,Physics,Motion,12,25
+1005,Aman Verma,10,A,Unit Test 1,Science,Physics,Light,9,25
+1005,Aman Verma,10,A,Unit Test 1,Science,Physics,Electricity,11,25
+1005,Aman Verma,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,9,25
+1005,Aman Verma,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,11,25
+1005,Aman Verma,10,A,Unit Test 1,Science,Biology,Life Processes,9,25
+1005,Aman Verma,10,A,Unit Test 1,English,Reading,Reading Comprehension,13,25
+1005,Aman Verma,10,A,Unit Test 1,English,Grammar,Grammar,11,25
+1005,Aman Verma,10,A,Unit Test 1,English,Writing,Writing Skills,13,25
+1005,Aman Verma,10,A,Unit Test 1,English,Literature,Literature,11,25
+1005,Aman Verma,10,A,Unit Test 1,Social Science,History,Nationalism,13,25
+1005,Aman Verma,10,A,Unit Test 1,Social Science,Geography,Resources,11,25
+1005,Aman Verma,10,A,Unit Test 1,Social Science,Civics,Democracy,12,25
+1005,Aman Verma,10,A,Unit Test 1,Social Science,Economics,Development,11,25
+1005,Aman Verma,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,11,25
+1005,Aman Verma,10,A,Unit Test 1,Computer Science,Programming,Data Structures,9,25
+1005,Aman Verma,10,A,Unit Test 1,Computer Science,Databases,Databases,10,25
+1005,Aman Verma,10,A,Unit Test 1,Computer Science,Networking,Networking,9,25
+1006,Meera Krishnan,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,24,25
+1006,Meera Krishnan,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,Mathematics,Geometry,Triangles,23,25
+1006,Meera Krishnan,10,A,Unit Test 1,Mathematics,Geometry,Circles,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,23,25
+1006,Meera Krishnan,10,A,Unit Test 1,Mathematics,Statistics,Statistics,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,Science,Physics,Motion,23,25
+1006,Meera Krishnan,10,A,Unit Test 1,Science,Physics,Light,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,Science,Physics,Electricity,22,25
+1006,Meera Krishnan,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,20,25
+1006,Meera Krishnan,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,23,25
+1006,Meera Krishnan,10,A,Unit Test 1,Science,Biology,Life Processes,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,English,Reading,Reading Comprehension,24,25
+1006,Meera Krishnan,10,A,Unit Test 1,English,Grammar,Grammar,22,25
+1006,Meera Krishnan,10,A,Unit Test 1,English,Writing,Writing Skills,24,25
+1006,Meera Krishnan,10,A,Unit Test 1,English,Literature,Literature,22,25
+1006,Meera Krishnan,10,A,Unit Test 1,Social Science,History,Nationalism,24,25
+1006,Meera Krishnan,10,A,Unit Test 1,Social Science,Geography,Resources,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,Social Science,Civics,Democracy,23,25
+1006,Meera Krishnan,10,A,Unit Test 1,Social Science,Economics,Development,21,25
+1006,Meera Krishnan,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,24,25
+1006,Meera Krishnan,10,A,Unit Test 1,Computer Science,Programming,Data Structures,22,25
+1006,Meera Krishnan,10,A,Unit Test 1,Computer Science,Databases,Databases,23,25
+1006,Meera Krishnan,10,A,Unit Test 1,Computer Science,Networking,Networking,22,25
+1007,Arjun Reddy,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,11,25
+1007,Arjun Reddy,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,14,25
+1007,Arjun Reddy,10,A,Unit Test 1,Mathematics,Geometry,Triangles,16,25
+1007,Arjun Reddy,10,A,Unit Test 1,Mathematics,Geometry,Circles,14,25
+1007,Arjun Reddy,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,11,25
+1007,Arjun Reddy,10,A,Unit Test 1,Mathematics,Statistics,Statistics,14,25
+1007,Arjun Reddy,10,A,Unit Test 1,Science,Physics,Motion,16,25
+1007,Arjun Reddy,10,A,Unit Test 1,Science,Physics,Light,14,25
+1007,Arjun Reddy,10,A,Unit Test 1,Science,Physics,Electricity,15,25
+1007,Arjun Reddy,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,13,25
+1007,Arjun Reddy,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,16,25
+1007,Arjun Reddy,10,A,Unit Test 1,Science,Biology,Life Processes,14,25
+1007,Arjun Reddy,10,A,Unit Test 1,English,Reading,Reading Comprehension,15,25
+1007,Arjun Reddy,10,A,Unit Test 1,English,Grammar,Grammar,13,25
+1007,Arjun Reddy,10,A,Unit Test 1,English,Writing,Writing Skills,14,25
+1007,Arjun Reddy,10,A,Unit Test 1,English,Literature,Literature,13,25
+1007,Arjun Reddy,10,A,Unit Test 1,Social Science,History,Nationalism,17,25
+1007,Arjun Reddy,10,A,Unit Test 1,Social Science,Geography,Resources,15,25
+1007,Arjun Reddy,10,A,Unit Test 1,Social Science,Civics,Democracy,17,25
+1007,Arjun Reddy,10,A,Unit Test 1,Social Science,Economics,Development,15,25
+1007,Arjun Reddy,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,19,25
+1007,Arjun Reddy,10,A,Unit Test 1,Computer Science,Programming,Data Structures,16,25
+1007,Arjun Reddy,10,A,Unit Test 1,Computer Science,Databases,Databases,18,25
+1007,Arjun Reddy,10,A,Unit Test 1,Computer Science,Networking,Networking,16,25
+1008,Sara Fernandes,10,A,Unit Test 1,Mathematics,Algebra,Quadratic Equations,12,25
+1008,Sara Fernandes,10,A,Unit Test 1,Mathematics,Algebra,Polynomials,18,25
+1008,Sara Fernandes,10,A,Unit Test 1,Mathematics,Geometry,Triangles,19,25
+1008,Sara Fernandes,10,A,Unit Test 1,Mathematics,Geometry,Circles,17,25
+1008,Sara Fernandes,10,A,Unit Test 1,Mathematics,Trigonometry,Trigonometry,20,25
+1008,Sara Fernandes,10,A,Unit Test 1,Mathematics,Statistics,Statistics,18,25
+1008,Sara Fernandes,10,A,Unit Test 1,Science,Physics,Motion,21,25
+1008,Sara Fernandes,10,A,Unit Test 1,Science,Physics,Light,18,25
+1008,Sara Fernandes,10,A,Unit Test 1,Science,Physics,Electricity,20,25
+1008,Sara Fernandes,10,A,Unit Test 1,Science,Chemistry,Chemical Reactions,18,25
+1008,Sara Fernandes,10,A,Unit Test 1,Science,Chemistry,Acids and Bases,20,25
+1008,Sara Fernandes,10,A,Unit Test 1,Science,Biology,Life Processes,18,25
+1008,Sara Fernandes,10,A,Unit Test 1,English,Reading,Reading Comprehension,22,25
+1008,Sara Fernandes,10,A,Unit Test 1,English,Grammar,Grammar,19,25
+1008,Sara Fernandes,10,A,Unit Test 1,English,Writing,Writing Skills,21,25
+1008,Sara Fernandes,10,A,Unit Test 1,English,Literature,Literature,19,25
+1008,Sara Fernandes,10,A,Unit Test 1,Social Science,History,Nationalism,19,25
+1008,Sara Fernandes,10,A,Unit Test 1,Social Science,Geography,Resources,17,25
+1008,Sara Fernandes,10,A,Unit Test 1,Social Science,Civics,Democracy,18,25
+1008,Sara Fernandes,10,A,Unit Test 1,Social Science,Economics,Development,17,25
+1008,Sara Fernandes,10,A,Unit Test 1,Computer Science,Programming,Programming Basics,21,25
+1008,Sara Fernandes,10,A,Unit Test 1,Computer Science,Programming,Data Structures,19,25
+1008,Sara Fernandes,10,A,Unit Test 1,Computer Science,Databases,Databases,21,25
+1008,Sara Fernandes,10,A,Unit Test 1,Computer Science,Networking,Networking,19,25

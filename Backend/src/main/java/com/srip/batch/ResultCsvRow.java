@@ -1,9 +1,16 @@
 package com.srip.batch;
 
-import java.util.List;
-
 /**
  * One raw CSV row, before any validation or lookup.
+ *
+ * <p>The file is delivered one <em>topic</em> per line, not one subject per
+ * line:
+ * <pre>
+ * 1001,Ayushman,10,A,Midterm,Mathematics,Algebra,Quadratic Equations,10,25
+ * </pre>
+ * Several lines therefore describe the same subject paper, and the subject total
+ * is the sum of them. That is why nothing here maps to a subject result
+ * directly.
  *
  * <p>Fields are kept as strings on purpose. If {@code marks_obtained} were
  * parsed to a number here, a row containing "N/A" would fail inside the reader
@@ -17,17 +24,15 @@ import java.util.List;
 public record ResultCsvRow(
         int lineNumber,
         String rawLine,
-        String admissionNo,
-        String examCode,
-        String subjectCode,
+        String studentId,
+        String studentName,
+        String className,
+        String section,
+        String examName,
+        String subject,
+        String chapterName,
+        String topicName,
         String marksObtained,
-        String maxMarks,
-        String attempted,
-        String remarks,
-        List<TopicMark> topicMarks
+        String maximumMarks
 ) {
-
-    /** One topic entry parsed out of the {@code topic_breakdown} column. */
-    public record TopicMark(String topicName, String marksObtained, String maxMarks) {
-    }
 }

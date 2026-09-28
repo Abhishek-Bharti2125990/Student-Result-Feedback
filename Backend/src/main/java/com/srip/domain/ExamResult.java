@@ -1,6 +1,5 @@
 package com.srip.domain;
 
-import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -25,6 +24,11 @@ import java.util.List;
  * <p>{@code percentage} and {@code grade} are stored rather than derived on read:
  * rankings and class aggregates sort and average over them, and recomputing on
  * every query would mean scanning the whole class for each request.
+ *
+ * <p>The marks are the sum of this subject's {@link TopicScore} rows, because
+ * the upload arrives one topic per line. Nothing writes {@code marksObtained}
+ * directly from a file; the import job recomputes it from the topic rows after
+ * each chunk, so the total always agrees with its breakdown.
  */
 @Entity
 @Table(name = "exam_results")
@@ -46,10 +50,10 @@ public class ExamResult {
     @JoinColumn(name = "subject_id", nullable = false)
     private Subject subject;
 
-    @Column(name = "marks_obtained", nullable = false, precision = 6, scale = 2)
+    @Column(name = "marks_obtained", nullable = false, precision = 8, scale = 2)
     private BigDecimal marksObtained;
 
-    @Column(name = "max_marks", nullable = false, precision = 6, scale = 2)
+    @Column(name = "max_marks", nullable = false, precision = 8, scale = 2)
     private BigDecimal maxMarks;
 
     @Column(nullable = false, precision = 5, scale = 2)
@@ -68,7 +72,13 @@ public class ExamResult {
     @Column(name = "upload_job_id")
     private Long uploadJobId;
 
-    @OneToMany(mappedBy = "examResult", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
+    /**
+     * Read-only view of the breakdown. No cascade and no orphan removal: the
+     * import writer creates and updates {@link TopicScore} rows directly, and
+     * declaring a second owner of the same rows here would mean two code paths
+     * could disagree about whether one exists.
+     */
+    @OneToMany(mappedBy = "examResult", fetch = FetchType.LAZY)
     private List<TopicScore> topicScores = new ArrayList<>();
 
     @Column(name = "created_at", nullable = false)
@@ -97,15 +107,6 @@ public class ExamResult {
     @PreUpdate
     void onUpdate() {
         this.updatedAt = Instant.now();
-    }
-
-    public void addTopicScore(TopicScore score) {
-        score.setExamResult(this);
-        this.topicScores.add(score);
-    }
-
-    public void clearTopicScores() {
-        this.topicScores.clear();
     }
 
     public Long getId() {

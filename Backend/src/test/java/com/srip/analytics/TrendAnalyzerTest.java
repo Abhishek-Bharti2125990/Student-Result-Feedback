@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class TrendAnalyzerTest {
 
     private final TrendAnalyzer analyzer =
-            new TrendAnalyzer(new AnalyticsProperties(null, null, null, 2));
+            new TrendAnalyzer(new AnalyticsProperties(null, null, null, null, 2));
 
     private final Student student = new Student("STU1", "Aarav", "10", "A", "2025-2026");
     private final Subject maths = new Subject("MATH", "Mathematics", "10");

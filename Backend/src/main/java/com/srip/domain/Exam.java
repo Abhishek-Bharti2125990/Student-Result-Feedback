@@ -17,7 +17,8 @@ public class Exam {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false, unique = true, length = 32)
+    /** Slug of {@link #name}, e.g. {@code UNIT-TEST-1}; see {@code Subject.code}. */
+    @Column(nullable = false, unique = true, length = 64)
     private String code;
 
     @Column(nullable = false, length = 96)

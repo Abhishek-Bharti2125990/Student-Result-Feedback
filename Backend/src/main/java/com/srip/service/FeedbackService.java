@@ -2,68 +2,60 @@ package com.srip.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.srip.ai.ClaudeClient;
-import com.srip.ai.FallbackFeedbackWriter;
-import com.srip.ai.PromptFactory;
+import com.srip.ai.ClaudeService;
 import com.srip.config.CacheConfig;
 import com.srip.domain.AiFeedback;
 import com.srip.dto.ai.FeedbackDtos.FeedbackEnvelope;
-import com.srip.dto.ai.FeedbackDtos.ParentFeedback;
 import com.srip.dto.ai.FeedbackDtos.StudentFeedback;
 import com.srip.dto.ai.FeedbackDtos.TeacherFeedback;
 import com.srip.dto.analytics.AnalyticsDtos.ClassAnalytics;
 import com.srip.dto.analytics.AnalyticsDtos.StudentSnapshot;
+import com.srip.dto.dashboard.DashboardDtos.ResourceSuggestion;
 import com.srip.exception.ApiExceptions;
 import com.srip.repository.AiFeedbackRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.cache.annotation.CachePut;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.cache.annotation.Caching;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
-import java.util.function.Supplier;
 
 /**
- * Produces the three feedback documents and keeps them.
+ * Produces the two feedback documents and keeps them.
  *
  * <p>A model call costs money and is not reproducible, so feedback is generated
- * once and then read back: the parent who opens the portal a week later must
+ * once and then read back: the student who opens the portal a week later must
  * see the same words the teacher saw. {@code refresh=true} is the explicit
- * override when a re-upload has changed the underlying marks.
+ * override when a re-upload has changed the underlying marks, and it is what the
+ * import job's final step uses.
  *
- * <p>If the Claude API is unavailable - no key, or the call fails - the
- * rule-based writer produces the document instead and the response says so via
- * {@code source}. A result portal going dark because an upstream service is
- * down would be a worse failure than slightly plainer prose.
+ * <p>This class is only about assembling the input and storing the output.
+ * Choosing between Claude and the local writer belongs to
+ * {@link ClaudeService}, so that decision is made in one place rather than at
+ * every call site.
  */
 @Service
 public class FeedbackService {
 
-    private static final Logger log = LoggerFactory.getLogger(FeedbackService.class);
-
     private final AnalyticsService analytics;
     private final ClassInsightService classInsights;
-    private final ClaudeClient claude;
-    private final PromptFactory prompts;
-    private final FallbackFeedbackWriter fallback;
+    private final StudyResourceService studyResources;
+    private final ClaudeService claudeService;
     private final AiFeedbackRepository stored;
     private final ObjectMapper objectMapper;
 
     public FeedbackService(AnalyticsService analytics,
                            ClassInsightService classInsights,
-                           ClaudeClient claude,
-                           PromptFactory prompts,
-                           FallbackFeedbackWriter fallback,
+                           StudyResourceService studyResources,
+                           ClaudeService claudeService,
                            AiFeedbackRepository stored,
                            ObjectMapper objectMapper) {
         this.analytics = analytics;
         this.classInsights = classInsights;
-        this.claude = claude;
-        this.prompts = prompts;
-        this.fallback = fallback;
+        this.studyResources = studyResources;
+        this.claudeService = claudeService;
         this.stored = stored;
         this.objectMapper = objectMapper;
     }
@@ -88,46 +80,12 @@ public class FeedbackService {
         }
 
         StudentSnapshot snapshot = analytics.snapshot(studentId, examId);
-        return generate(
-                AiFeedback.Audience.STUDENT,
-                studentId,
-                null,
-                examId,
-                StudentFeedback.class,
-                prompts.studentSystemPrompt(),
-                () -> prompts.studentUserPrompt(snapshot),
-                () -> fallback.studentFeedback(snapshot));
-    }
+        List<ResourceSuggestion> resources = studyResources.forWeakTopics(snapshot.weakTopics());
 
-    // -- Parent -------------------------------------------------------------
+        ClaudeService.Generated<StudentFeedback> generated =
+                claudeService.studentFeedback(snapshot, resources);
 
-    @Caching(
-            cacheable = @Cacheable(cacheNames = CacheConfig.CACHE_FEEDBACK,
-                    key = "'parent:' + #studentId + ':' + #examId", condition = "!#refresh"),
-            put = @CachePut(cacheNames = CacheConfig.CACHE_FEEDBACK,
-                    key = "'parent:' + #studentId + ':' + #examId", condition = "#refresh"))
-    @Transactional
-    public FeedbackEnvelope parentFeedback(Long studentId, Long examId, boolean refresh) {
-        if (!refresh) {
-            Optional<FeedbackEnvelope> existing = readStored(
-                    stored.findFirstByStudentIdAndExamIdAndAudienceOrderByGeneratedAtDesc(
-                            studentId, examId, AiFeedback.Audience.PARENT),
-                    ParentFeedback.class);
-            if (existing.isPresent()) {
-                return existing.get();
-            }
-        }
-
-        StudentSnapshot snapshot = analytics.snapshot(studentId, examId);
-        return generate(
-                AiFeedback.Audience.PARENT,
-                studentId,
-                null,
-                examId,
-                ParentFeedback.class,
-                prompts.parentSystemPrompt(),
-                () -> prompts.studentUserPrompt(snapshot),
-                () -> fallback.parentFeedback(snapshot));
+        return store(generated, AiFeedback.Audience.STUDENT, studentId, null, examId);
     }
 
     // -- Teacher ------------------------------------------------------------
@@ -150,73 +108,53 @@ public class FeedbackService {
         }
 
         ClassAnalytics classAnalytics = classInsights.classAnalytics(examId, className);
-        return generate(
-                AiFeedback.Audience.TEACHER,
-                null,
-                className,
-                examId,
-                TeacherFeedback.class,
-                prompts.teacherSystemPrompt(),
-                () -> prompts.teacherUserPrompt(classAnalytics),
-                () -> fallback.teacherFeedback(classAnalytics));
+        ClaudeService.Generated<TeacherFeedback> generated =
+                claudeService.teacherFeedback(classAnalytics);
+
+        return store(generated, AiFeedback.Audience.TEACHER, null, className, examId);
+    }
+
+    /**
+     * The stored teacher document, or empty when none has been generated.
+     *
+     * <p>The dashboard uses this rather than {@link #teacherFeedback} so that
+     * drawing a page never triggers a billed model call as a side effect.
+     */
+    @Transactional(readOnly = true)
+    public Optional<FeedbackEnvelope> storedTeacherFeedback(Long examId, String className) {
+        return readStored(
+                stored.findFirstByClassNameAndExamIdAndAudienceOrderByGeneratedAtDesc(
+                        className, examId, AiFeedback.Audience.TEACHER),
+                TeacherFeedback.class);
     }
 
     // -- Internals -----------------------------------------------------------
 
-    /**
-     * Calls Claude, or the local writer if Claude is unavailable, then persists
-     * the result.
-     *
-     * @param userPrompt      built lazily so the prompt is not assembled when
-     *                        the fallback path is taken
-     * @param fallbackWriter  the local generator for this audience
-     */
-    private <T> FeedbackEnvelope generate(AiFeedback.Audience audience,
-                                          Long studentId,
-                                          String className,
-                                          Long examId,
-                                          Class<T> type,
-                                          String systemPrompt,
-                                          Supplier<String> userPrompt,
-                                          Supplier<T> fallbackWriter) {
-
-        T payload;
-        String model;
-        AiFeedback.Source source;
-        Integer inputTokens = null;
-        Integer outputTokens = null;
-
-        if (claude.isAvailable()) {
-            try {
-                ClaudeClient.Generated<T> generated =
-                        claude.generate(type, systemPrompt, userPrompt.get());
-                payload = generated.value();
-                model = generated.model();
-                source = AiFeedback.Source.CLAUDE;
-                inputTokens = generated.inputTokens();
-                outputTokens = generated.outputTokens();
-                log.info("Generated {} feedback via {} ({} in / {} out tokens)",
-                        audience, model, inputTokens, outputTokens);
-            } catch (ApiExceptions.AiGenerationException e) {
-                log.warn("Claude call failed for {} feedback, using the local writer instead: {}",
-                        audience, e.getMessage());
-                payload = fallbackWriter.get();
-                model = "rule-based";
-                source = AiFeedback.Source.FALLBACK;
-            }
-        } else {
-            payload = fallbackWriter.get();
-            model = "rule-based";
-            source = AiFeedback.Source.FALLBACK;
-        }
-
+    private <T> FeedbackEnvelope store(ClaudeService.Generated<T> generated,
+                                       AiFeedback.Audience audience,
+                                       Long studentId,
+                                       String className,
+                                       Long examId) {
         AiFeedback record = new AiFeedback(
-                studentId, className, examId, audience, toJson(payload),
-                model, source, inputTokens, outputTokens);
+                studentId,
+                className,
+                examId,
+                audience,
+                toJson(generated.payload()),
+                generated.model(),
+                generated.source(),
+                generated.inputTokens(),
+                generated.outputTokens());
+
         AiFeedback saved = stored.save(record);
 
         return new FeedbackEnvelope(
-                audience.name(), model, source.name(), saved.getGeneratedAt(), false, payload);
+                audience.name(),
+                generated.model(),
+                generated.source().name(),
+                saved.getGeneratedAt(),
+                false,
+                generated.payload());
     }
 
     private <T> Optional<FeedbackEnvelope> readStored(Optional<AiFeedback> record, Class<T> type) {

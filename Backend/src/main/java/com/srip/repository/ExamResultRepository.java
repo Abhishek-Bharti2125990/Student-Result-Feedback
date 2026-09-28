@@ -88,4 +88,17 @@ public interface ExamResultRepository extends JpaRepository<ExamResult, Long> {
     boolean existsByExamIdAndStudentClassName(Long examId, String className);
 
     long countByUploadJobId(Long uploadJobId);
+
+    /**
+     * The (student, exam) pairs one upload touched.
+     *
+     * <p>The analytics and AI steps recompute only what the file changed rather
+     * than the whole school, so this is how they learn their scope.
+     */
+    @Query("""
+            select distinct r.student.id, r.exam.id
+            from ExamResult r
+            where r.uploadJobId = :uploadJobId
+            """)
+    List<Object[]> findStudentExamPairsForUploadJob(@Param("uploadJobId") Long uploadJobId);
 }

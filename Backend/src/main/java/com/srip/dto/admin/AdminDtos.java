@@ -35,15 +35,7 @@ public final class AdminDtos {
     public record SubjectView(Long id, String code, String name, String className) {
     }
 
-    public record TopicView(Long id, String name, String subjectCode) {
-    }
-
-    /** Grants a parent login read access to one child. */
-    public record ParentLinkRequest(
-            @NotBlank String parentUsername,
-            @NotBlank String admissionNo,
-            String relationship
-    ) {
+    public record TopicView(Long id, String chapterName, String name, String subjectCode) {
     }
 
     /** Records which class and subject a teacher is responsible for. */

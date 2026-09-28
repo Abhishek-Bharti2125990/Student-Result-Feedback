@@ -16,17 +16,16 @@ import java.time.Instant;
  * A generated feedback document, stored as JSON.
  *
  * <p>Persisting the result matters for more than speed: a model call is billed
- * and non-deterministic, so the feedback a parent was shown last week has to
+ * and non-deterministic, so the feedback a student was shown last week has to
  * stay retrievable exactly as it was written.
  */
 @Entity
-@Table(name = "ai_feedback")
+@Table(name = "feedback")
 public class AiFeedback {
 
     public enum Audience {
         STUDENT,
-        TEACHER,
-        PARENT
+        TEACHER
     }
 
     public enum Source {
@@ -44,7 +43,7 @@ public class AiFeedback {
     @Column(name = "student_id")
     private Long studentId;
 
-    /** Set for TEACHER feedback; null for student- and parent-facing documents. */
+    /** Set for TEACHER feedback; null for student-facing documents. */
     @Column(name = "class_name", length = 16)
     private String className;
 

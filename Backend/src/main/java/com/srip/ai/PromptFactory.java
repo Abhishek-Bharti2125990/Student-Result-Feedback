@@ -1,6 +1,10 @@
 package com.srip.ai;
 
+import com.srip.dto.analytics.AnalyticsDtos.CategoryCount;
 import com.srip.dto.analytics.AnalyticsDtos.ClassAnalytics;
+import com.srip.dto.analytics.AnalyticsDtos.ClassTopicWeakness;
+import com.srip.dto.analytics.AnalyticsDtos.StrongSubject;
+import com.srip.dto.analytics.AnalyticsDtos.StrongTopic;
 import com.srip.dto.analytics.AnalyticsDtos.StrugglingStudent;
 import com.srip.dto.analytics.AnalyticsDtos.StudentSnapshot;
 import com.srip.dto.analytics.AnalyticsDtos.SubjectPerformance;
@@ -8,6 +12,7 @@ import com.srip.dto.analytics.AnalyticsDtos.SubjectStat;
 import com.srip.dto.analytics.AnalyticsDtos.SubjectTrend;
 import com.srip.dto.analytics.AnalyticsDtos.WeakSubject;
 import com.srip.dto.analytics.AnalyticsDtos.WeakTopic;
+import com.srip.dto.dashboard.DashboardDtos.ResourceSuggestion;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
@@ -25,6 +30,12 @@ import java.util.List;
  * model is asked to interpret and advise, never to calculate: arithmetic is the
  * one thing this system already knows exactly, and letting a model redo it
  * would introduce errors for no benefit.
+ *
+ * <p>Learning resources are supplied the same way, from the {@code
+ * study_resources} table. A model asked for "a good book on quadratic equations"
+ * will happily produce a plausible title that does not exist; giving it the
+ * school's own vetted list and forbidding anything else is what makes a
+ * recommendation safe to print.
  */
 @Component
 public class PromptFactory {
@@ -36,6 +47,10 @@ public class PromptFactory {
 
             Be specific. "Work harder at maths" is useless; "re-solve the \
             quadratic-equation set, where 12 of 25 marks were lost" is useful.
+
+            Only ever name a book or video that appears in the LEARNING \
+            RESOURCES section. If a topic has none listed, recommend the action \
+            without naming a resource. Never invent a title, an author or a link.
 
             Do not moralise, shame, or compare the student to named peers. Rank \
             and class average may be mentioned as context, never as a verdict on \
@@ -50,7 +65,9 @@ public class PromptFactory {
             Address the student as "you". Keep the language plain and warm \
             without being patronising. The study plan must be something a \
             teenager can actually follow alongside normal school work: concrete \
-            tasks, realistic weekly hours, hardest-hitting weakness first.
+            tasks, realistic daily minutes, hardest-hitting weakness first. \
+            Where a listed resource covers a weak topic, put its exact title in \
+            the resource field of that study plan item.
             """.formatted(COMMON_RULES);
 
     static final String TEACHER_SYSTEM_PROMPT = """
@@ -63,21 +80,8 @@ public class PromptFactory {
             one. Distinguish an individual problem from a class-wide one - if \
             most of the class lost marks on the same topic, that is a teaching \
             issue, not forty separate student issues, and it should appear under \
-            topics to re-teach.
-            """.formatted(COMMON_RULES);
-
-    static final String PARENT_SYSTEM_PROMPT = """
-            You are a school counsellor writing to the parent or guardian of a \
-            secondary school student after an exam.
-
-            %s
-
-            Assume no educational jargon and no familiarity with grading \
-            systems; explain anything technical in one clause. Assume the parent \
-            works and has limited evening time, so every recommendation must be \
-            achievable in that reality. Open with what is going well. Never \
-            suggest punishment, withdrawal of privileges, or private tuition as \
-            a default answer.
+            topics to re-teach. Prefer concrete departmental actions: remedial \
+            classes, worksheets, revision sessions, peer pairing.
             """.formatted(COMMON_RULES);
 
     public String studentSystemPrompt() {
@@ -88,13 +92,15 @@ public class PromptFactory {
         return TEACHER_SYSTEM_PROMPT;
     }
 
-    public String parentSystemPrompt() {
-        return PARENT_SYSTEM_PROMPT;
-    }
-
-    /** The per-student payload shared by the student and parent prompts. */
-    public String studentUserPrompt(StudentSnapshot snapshot) {
-        StringBuilder out = new StringBuilder(1024);
+    /**
+     * The per-student payload.
+     *
+     * @param resources the vetted books and videos for this student's weak
+     *                  topics; may be empty, in which case the model is told so
+     *                  rather than left to guess
+     */
+    public String studentUserPrompt(StudentSnapshot snapshot, List<ResourceSuggestion> resources) {
+        StringBuilder out = new StringBuilder(2048);
 
         out.append("STUDENT\n")
                 .append("Name: ").append(snapshot.studentName()).append('\n')
@@ -109,6 +115,8 @@ public class PromptFactory {
         out.append("OVERALL\n")
                 .append("Percentage: ").append(plain(snapshot.overallPercentage())).append("%\n")
                 .append("Grade: ").append(snapshot.overallGrade()).append('\n')
+                .append("Category: ").append(snapshot.category()).append(" (")
+                .append(snapshot.category().label()).append(")\n")
                 .append("Result: ").append(snapshot.passed() ? "pass" : "below pass mark").append('\n')
                 .append("Rank: ").append(snapshot.rankInClass())
                 .append(" of ").append(snapshot.classSize()).append('\n')
@@ -131,9 +139,12 @@ public class PromptFactory {
             out.append('\n');
         }
 
+        appendStrongSubjects(out, snapshot.strongSubjects());
         appendWeakSubjects(out, snapshot.weakSubjects());
+        appendStrongTopics(out, snapshot.strongTopics());
         appendWeakTopics(out, snapshot.weakTopics());
         appendTrends(out, snapshot);
+        appendResources(out, resources);
 
         out.append("\nWrite the feedback document now, following the required schema.");
         return out.toString();
@@ -141,18 +152,24 @@ public class PromptFactory {
 
     /** The per-class payload for the teacher prompt. */
     public String teacherUserPrompt(ClassAnalytics analytics) {
-        StringBuilder out = new StringBuilder(1024);
+        StringBuilder out = new StringBuilder(2048);
 
         out.append("CLASS\n")
                 .append("Class: ").append(analytics.className()).append('\n')
                 .append("Exam: ").append(analytics.examName())
                 .append(" (").append(analytics.examCode()).append(")\n")
-                .append("Students: ").append(analytics.classSize()).append('\n')
+                .append("Total students: ").append(analytics.classSize()).append('\n')
                 .append("Class average: ").append(plain(analytics.classAveragePercentage())).append("%\n")
                 .append("Highest: ").append(plain(analytics.highestPercentage())).append("%\n")
                 .append("Lowest: ").append(plain(analytics.lowestPercentage())).append("%\n\n");
 
-        out.append("SUBJECT BREAKDOWN (weakest first)\n");
+        out.append("SCORE CATEGORIES\n");
+        for (CategoryCount count : analytics.categoryCounts()) {
+            out.append("- ").append(count.category()).append(" (").append(count.label())
+                    .append("): ").append(count.students()).append(" student(s)\n");
+        }
+
+        out.append("\nSUBJECT BREAKDOWN (weakest first)\n");
         for (SubjectStat stat : analytics.subjectStats()) {
             out.append("- ").append(stat.subjectName())
                     .append(": average ").append(plain(stat.average())).append('%')
@@ -161,6 +178,21 @@ public class PromptFactory {
                     .append(", passed ").append(stat.passCount())
                     .append(", failed ").append(stat.failCount())
                     .append('\n');
+        }
+
+        out.append("\nWEAKEST TOPICS ACROSS THE CLASS\n");
+        if (analytics.weakestTopics().isEmpty()) {
+            out.append("- none flagged\n");
+        } else {
+            for (ClassTopicWeakness topic : analytics.weakestTopics()) {
+                out.append("- ").append(topic.topicName())
+                        .append(" (").append(topic.subjectName());
+                if (topic.chapterName() != null) {
+                    out.append(", chapter ").append(topic.chapterName());
+                }
+                out.append("): ").append(topic.weakStudents()).append(" student(s) weak, class average ")
+                        .append(plain(topic.classAveragePercentage())).append("%\n");
+            }
         }
 
         out.append("\nSTUDENTS NEEDING ATTENTION (lowest first)\n");
@@ -186,6 +218,18 @@ public class PromptFactory {
         return out.toString();
     }
 
+    private void appendStrongSubjects(StringBuilder out, List<StrongSubject> strongSubjects) {
+        out.append("\nSTRONG SUBJECTS DETECTED\n");
+        if (strongSubjects.isEmpty()) {
+            out.append("- none reached the strength threshold\n");
+            return;
+        }
+        for (StrongSubject strong : strongSubjects) {
+            out.append("- ").append(strong.subjectName())
+                    .append(" at ").append(plain(strong.averagePercentage())).append("%\n");
+        }
+    }
+
     private void appendWeakSubjects(StringBuilder out, List<WeakSubject> weakSubjects) {
         out.append("\nWEAK SUBJECTS DETECTED\n");
         if (weakSubjects.isEmpty()) {
@@ -199,8 +243,20 @@ public class PromptFactory {
         }
     }
 
+    private void appendStrongTopics(StringBuilder out, List<StrongTopic> strongTopics) {
+        out.append("\nSTRONG TOPICS DETECTED\n");
+        if (strongTopics.isEmpty()) {
+            out.append("- none reached the strength threshold\n");
+            return;
+        }
+        for (StrongTopic strong : strongTopics) {
+            out.append("- ").append(strong.subjectCode()).append(" / ").append(strong.topicName())
+                    .append(": ").append(plain(strong.averagePercentage())).append("%\n");
+        }
+    }
+
     private void appendWeakTopics(StringBuilder out, List<WeakTopic> weakTopics) {
-        out.append("\nWEAK TOPICS DETECTED (across all exams sat)\n");
+        out.append("\nWEAK TOPICS DETECTED\n");
         if (weakTopics.isEmpty()) {
             out.append("- none, or no topic-level marks were recorded\n");
             return;
@@ -209,7 +265,7 @@ public class PromptFactory {
             out.append("- ").append(weak.subjectCode()).append(" / ").append(weak.topicName())
                     .append(": average ").append(plain(weak.averagePercentage())).append('%');
             if (weak.occurrences() > 1) {
-                out.append(" - weak in ").append(weak.occurrences()).append(" separate exams");
+                out.append(" - weak in ").append(weak.occurrences()).append(" separate papers");
             }
             out.append('\n');
         }
@@ -235,6 +291,23 @@ public class PromptFactory {
                     .append(": ").append(trend.direction())
                     .append(" (").append(signed(trend.change())).append(" points, ")
                     .append(trend.points().size()).append(" exam(s))\n");
+        }
+    }
+
+    private void appendResources(StringBuilder out, List<ResourceSuggestion> resources) {
+        out.append("\nLEARNING RESOURCES (the only ones you may name)\n");
+        if (resources == null || resources.isEmpty()) {
+            out.append("- none available for these topics; do not name any resource\n");
+            return;
+        }
+        for (ResourceSuggestion resource : resources) {
+            out.append("- ").append(resource.subject()).append(" / ").append(resource.topic())
+                    .append(" [").append(resource.resourceType()).append("] ")
+                    .append(resource.title());
+            if (resource.url() != null) {
+                out.append(" - ").append(resource.url());
+            }
+            out.append('\n');
         }
     }
 

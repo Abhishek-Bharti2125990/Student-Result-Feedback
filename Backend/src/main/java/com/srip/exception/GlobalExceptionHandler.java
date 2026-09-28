@@ -4,6 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -31,6 +32,19 @@ public class GlobalExceptionHandler {
     @ExceptionHandler({ApiExceptions.BadRequestException.class, MissingServletRequestParameterException.class})
     public ResponseEntity<Map<String, Object>> handleBadRequest(Exception e) {
         return body(HttpStatus.BAD_REQUEST, e.getMessage(), null);
+    }
+
+    /**
+     * A body Jackson cannot bind - malformed JSON, or a value outside an enum
+     * such as a role that no longer exists. That is the caller's mistake, so it
+     * must not fall through to the catch-all and be reported as a server fault.
+     */
+    @ExceptionHandler(HttpMessageNotReadableException.class)
+    public ResponseEntity<Map<String, Object>> handleUnreadableBody(HttpMessageNotReadableException e) {
+        // The cause carries the offending field and value; the wrapper message
+        // also carries the raw body, which should not be echoed back.
+        return body(HttpStatus.BAD_REQUEST,
+                "The request body could not be read; check the field types and any enum values", null);
     }
 
     @ExceptionHandler(ApiExceptions.ConflictException.class)

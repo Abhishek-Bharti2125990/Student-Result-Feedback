@@ -96,7 +96,7 @@ public class ResultUploadService {
         launch(job, stored);
 
         return new UploadAccepted(job.getId(), originalName, dataRows, job.getStatus(),
-                "Accepted for processing. Poll /api/uploads/" + job.getId() + " for progress.");
+                "Accepted for processing. Poll /api/admin/upload/" + job.getId() + " for progress.");
     }
 
     @Transactional(readOnly = true)

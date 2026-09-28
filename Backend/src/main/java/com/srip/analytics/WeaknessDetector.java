@@ -3,6 +3,8 @@ package com.srip.analytics;
 import com.srip.config.AnalyticsProperties;
 import com.srip.domain.ExamResult;
 import com.srip.domain.TopicScore;
+import com.srip.dto.analytics.AnalyticsDtos.StrongSubject;
+import com.srip.dto.analytics.AnalyticsDtos.StrongTopic;
 import com.srip.dto.analytics.AnalyticsDtos.WeakSubject;
 import com.srip.dto.analytics.AnalyticsDtos.WeakTopic;
 import org.springframework.stereotype.Service;
@@ -16,12 +18,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * Finds the subjects and topics a student is losing marks in.
+ * Finds the subjects and topics a student is losing marks in, and the ones they
+ * are carrying.
  *
- * <p>Two tests are applied, because one alone misses real cases. An absolute
- * threshold catches outright failure. A relative test - a subject well below
- * the student's own average - catches the strong student who scores 68 in one
- * subject while averaging 88 in the rest; that is a genuine gap that no
+ * <p>Two tests are applied to weakness, because one alone misses real cases. An
+ * absolute threshold catches outright failure. A relative test - a subject well
+ * below the student's own average - catches the strong student who scores 68 in
+ * one subject while averaging 88 in the rest; that is a genuine gap that no
  * absolute cutoff would ever flag.
  */
 @Service
@@ -110,6 +113,63 @@ public class WeaknessDetector {
                 // Repeated weakness outranks a single low score at the same average.
                 .sorted(Comparator.comparing(WeakTopic::averagePercentage)
                         .thenComparing(Comparator.comparingInt(WeakTopic::occurrences).reversed()))
+                .toList();
+    }
+
+    /**
+     * The mirror of {@link #detectWeakSubjects}: subjects at or above the strong
+     * threshold, best first.
+     *
+     * <p>No relative test here. A subject slightly above a student's own average
+     * is not a strength worth telling anyone about; only an absolute standard
+     * makes "you are strong at this" mean something.
+     */
+    public List<StrongSubject> detectStrongSubjects(List<ExamResult> results) {
+        if (results.isEmpty()) {
+            return List.of();
+        }
+
+        Map<String, Aggregate> bySubject = new LinkedHashMap<>();
+        for (ExamResult result : results) {
+            String code = result.getSubject().getCode();
+            bySubject.computeIfAbsent(code,
+                            key -> new Aggregate(code, result.getSubject().getName()))
+                    .add(result.getPercentage());
+        }
+
+        BigDecimal threshold = properties.strongThreshold();
+        return bySubject.values().stream()
+                .filter(aggregate -> aggregate.average().compareTo(threshold) >= 0)
+                .map(aggregate -> new StrongSubject(
+                        aggregate.code(), aggregate.name(), aggregate.average()))
+                .sorted(Comparator.comparing(StrongSubject::averagePercentage).reversed())
+                .toList();
+    }
+
+    /** Topics at or above the strong threshold, best first. */
+    public List<StrongTopic> detectStrongTopics(List<TopicScore> scores) {
+        if (scores.isEmpty()) {
+            return List.of();
+        }
+
+        BigDecimal threshold = properties.strongThreshold();
+        Map<String, TopicAggregate> byTopic = new LinkedHashMap<>();
+
+        for (TopicScore score : scores) {
+            String subjectCode = score.getTopic().getSubject().getCode();
+            String topicName = score.getTopic().getName();
+            byTopic.computeIfAbsent(subjectCode + "::" + topicName,
+                            ignored -> new TopicAggregate(subjectCode, topicName))
+                    // The aggregate also counts how often it was below the
+                    // threshold, which strength detection has no use for.
+                    .add(score.getPercentage(), threshold);
+        }
+
+        return byTopic.values().stream()
+                .filter(aggregate -> aggregate.average().compareTo(threshold) >= 0)
+                .map(aggregate -> new StrongTopic(
+                        aggregate.subjectCode(), aggregate.topicName(), aggregate.average()))
+                .sorted(Comparator.comparing(StrongTopic::averagePercentage).reversed())
                 .toList();
     }
 

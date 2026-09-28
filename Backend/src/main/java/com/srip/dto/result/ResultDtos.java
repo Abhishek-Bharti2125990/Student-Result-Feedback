@@ -44,6 +44,7 @@ public final class ResultDtos {
     }
 
     public record TopicScoreView(
+            String chapterName,
             String topicName,
             BigDecimal marksObtained,
             BigDecimal maxMarks,
