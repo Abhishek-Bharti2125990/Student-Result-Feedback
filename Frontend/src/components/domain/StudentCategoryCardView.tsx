@@ -1,14 +1,17 @@
-import { Lightbulb, TriangleAlert, Trophy } from 'lucide-react';
+import { Lightbulb, Minus, TrendingDown, TrendingUp, TriangleAlert, Trophy } from 'lucide-react';
 import { Badge } from '@/components/ui/Badge';
 import { CategoryBadge } from '@/components/domain/CategoryBadge';
 import { categoryStyle } from '@/lib/category';
 import { cn } from '@/lib/cn';
-import { percent, rank } from '@/lib/format';
+import { percent, rank, signedPercent } from '@/lib/format';
+import type { PerformanceTrend } from '@/types/analytics';
 import type { StudentCategoryCard } from '@/types/teacher';
 
 interface Props {
     student: StudentCategoryCard;
     classSize: number;
+    /** Undefined while loading; null when it could not be fetched. */
+    trend?: PerformanceTrend | null;
 }
 
 /**
@@ -19,7 +22,7 @@ interface Props {
  * link to a fuller profile - the backend has no per-student teacher view, and a
  * link that opened a thinner page than this one would be a step backwards.
  */
-export function StudentCategoryCardView({ student, classSize }: Props) {
+export function StudentCategoryCardView({ student, classSize, trend }: Props) {
     const style = categoryStyle(student.category);
 
     return (
@@ -42,8 +45,9 @@ export function StudentCategoryCardView({ student, classSize }: Props) {
                 </div>
             </header>
 
-            <div className="mt-3">
+            <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
                 <CategoryBadge category={student.category} />
+                <TrendLine trend={trend} />
             </div>
 
             {student.weakTopics.length > 0 && (
@@ -86,6 +90,36 @@ export function StudentCategoryCardView({ student, classSize }: Props) {
                 <p className="mt-1 text-sm leading-relaxed text-slate-700">{student.suggestedAction}</p>
             </section>
         </article>
+    );
+}
+
+/** "Improving +6.5%" from the student's exam history, or why there is none. */
+function TrendLine({ trend }: { trend?: PerformanceTrend | null }) {
+    if (trend === undefined) {
+        return <span className="h-4 w-20 animate-pulse rounded bg-slate-100" aria-label="Loading trend" />;
+    }
+    if (trend === null) return null;
+
+    if (trend.overallDirection === 'INSUFFICIENT_DATA') {
+        return <span className="text-xs text-slate-400">Trend: first exam</span>;
+    }
+
+    const { Icon, colour, label } = {
+        IMPROVING: { Icon: TrendingUp, colour: 'text-emerald-600', label: 'Improving' },
+        DECLINING: { Icon: TrendingDown, colour: 'text-red-600', label: 'Declining' },
+        STABLE: { Icon: Minus, colour: 'text-slate-500', label: 'Stable' },
+    }[trend.overallDirection];
+
+    return (
+        <span
+            className={cn('inline-flex items-center gap-1 text-xs font-medium', colour)}
+            title={trend.overall
+                .map((point) => `${point.examName}: ${percent(point.percentage)}`)
+                .join(' → ')}
+        >
+            <Icon className="size-3.5" aria-hidden />
+            {label} {signedPercent(trend.overallChange)}
+        </span>
     );
 }
 

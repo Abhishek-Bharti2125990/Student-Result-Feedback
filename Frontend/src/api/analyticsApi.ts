@@ -15,6 +15,14 @@ export const analyticsApi = {
     },
 
     /**
+     * One student's trend, for staff. Used for the "Trend" line on each card in
+     * the teacher's category lists; the backend checks the caller may read them.
+     */
+    studentTrend(studentId: number): Promise<PerformanceTrend> {
+        return api.get<PerformanceTrend>(`/analytics/students/${studentId}/trend`).then((r) => r.data);
+    },
+
+    /**
      * Class-wide figures for one exam. Staff only.
      *
      * Fetched alongside the teacher dashboard for one reason: per-subject class

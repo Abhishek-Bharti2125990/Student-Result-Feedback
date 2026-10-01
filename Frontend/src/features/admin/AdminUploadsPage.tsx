@@ -1,44 +1,31 @@
-import { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { useEffect } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
 import { History, RefreshCw, UploadCloud } from 'lucide-react';
 import { PageHeader } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { DataTable, type Column } from '@/components/ui/DataTable';
-import { EmptyState } from '@/components/ui/EmptyState';
 import { ErrorState } from '@/components/ui/ErrorState';
 import { CardSkeleton } from '@/components/ui/Skeleton';
 import { cn } from '@/lib/cn';
 import { dateTime } from '@/lib/format';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchUploadHistory, fetchUploadJob } from '@/store/slices/adminSlice';
+import { fetchUploadHistory } from '@/store/slices/adminSlice';
 import type { UploadJobView } from '@/types/admin';
-import { UploadErrorReport } from './UploadErrorReport';
-import { UploadStatusBadge, UploadStatusPanel } from './UploadStatusPanel';
+import { UploadStatusBadge } from './UploadStatusPanel';
 
 export function AdminUploadsPage() {
     const dispatch = useAppDispatch();
-    const { history, historyLoading, historyError, activeJob } = useAppSelector(
-        (state) => state.admin,
-    );
-
-    /**
-     * Which row is expanded.
-     *
-     * The history list returns jobs with an empty `errors` array - only the
-     * single-job endpoint carries the report - so selecting a row triggers that
-     * second fetch rather than filtering what is already in memory.
-     */
-    const [selectedId, setSelectedId] = useState<number | null>(null);
+    const navigate = useNavigate();
+    const { history, historyLoading, historyError } = useAppSelector((state) => state.admin);
 
     useEffect(() => {
         void dispatch(fetchUploadHistory());
     }, [dispatch]);
 
-    const select = (job: UploadJobView) => {
-        setSelectedId(job.id);
-        void dispatch(fetchUploadJob(job.id));
-    };
+    // The history rows carry an empty `errors` array - only the single-job
+    // endpoint has the report - so a row opens the job's own status page.
+    const select = (job: UploadJobView) => navigate(`/admin/uploads/${job.id}`);
 
     const columns: Array<Column<UploadJobView>> = [
         {
@@ -132,7 +119,7 @@ export function AdminUploadsPage() {
                                 title="Imports"
                                 subtitle={
                                     history.length > 0
-                                        ? 'Newest first — select a row for its error report'
+                                        ? 'Newest first — select a row for its processing status and error report'
                                         : undefined
                                 }
                                 icon={<History className="size-4" aria-hidden />}
@@ -149,22 +136,6 @@ export function AdminUploadsPage() {
                             />
                         </div>
                     </Card>
-
-                    {selectedId !== null && activeJob?.id === selectedId && (
-                        <>
-                            <UploadStatusPanel job={activeJob} />
-                            {activeJob.errors.length > 0 ? (
-                                <UploadErrorReport errors={activeJob.errors} />
-                            ) : (
-                                <Card>
-                                    <EmptyState
-                                        title="No rejected rows"
-                                        description="Every row in this file was imported."
-                                    />
-                                </Card>
-                            )}
-                        </>
-                    )}
                 </div>
             )}
         </>

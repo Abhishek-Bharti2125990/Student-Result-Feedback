@@ -1,58 +1,30 @@
 import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { FileSpreadsheet, History, Info, UploadCloud } from 'lucide-react';
+import { Activity, FileSpreadsheet, History, Info, UploadCloud } from 'lucide-react';
 import { PageHeader } from '@/components/layout/AppLayout';
 import { Button } from '@/components/ui/Button';
 import { Card, CardHeader } from '@/components/ui/Card';
 import { ProgressBar } from '@/components/ui/ProgressBar';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { clearUpload, fetchUploadJob, uploadCsv } from '@/store/slices/adminSlice';
+import { clearUpload, uploadCsv } from '@/store/slices/adminSlice';
 import { notify } from '@/store/slices/uiSlice';
 import { EXPECTED_CSV_HEADER, isInFlight } from '@/types/admin';
 import { CsvDropzone } from './CsvDropzone';
 import { UploadErrorReport } from './UploadErrorReport';
 import { UploadStatusPanel } from './UploadStatusPanel';
-
-/** How often to ask the server how the import is going. */
-const POLL_INTERVAL_MS = 1500;
+import { useUploadJobPolling } from './useUploadJobPolling';
 
 export function AdminUploadPage() {
     const dispatch = useAppDispatch();
-    const { uploading, uploadFraction, uploadError, activeJob, activeJobId } = useAppSelector(
+    const { uploading, uploadFraction, uploadError, activeJobId } = useAppSelector(
         (state) => state.admin,
     );
 
     const [file, setFile] = useState<File | null>(null);
 
-    /**
-     * Polling is driven by an effect keyed on the job id and its status.
-     *
-     * The interval is cleared the moment the job reaches a terminal state, so a
-     * finished import stops generating requests - a dashboard left open on a
-     * completed job should be silent, not hammering the API all afternoon.
-     */
-    const pollRef = useRef<number | null>(null);
-
-    useEffect(() => {
-        if (activeJobId === null) return;
-
-        const stillRunning = activeJob === null || isInFlight(activeJob.status);
-        if (!stillRunning) {
-            return;
-        }
-
-        void dispatch(fetchUploadJob(activeJobId));
-        pollRef.current = window.setInterval(() => {
-            void dispatch(fetchUploadJob(activeJobId));
-        }, POLL_INTERVAL_MS);
-
-        return () => {
-            if (pollRef.current !== null) {
-                window.clearInterval(pollRef.current);
-                pollRef.current = null;
-            }
-        };
-    }, [dispatch, activeJobId, activeJob?.status, activeJob]);
+    // Stops by itself once the job is terminal, so a page left open on a
+    // finished import is silent rather than polling all afternoon.
+    const { job: activeJob } = useUploadJobPolling(activeJobId);
 
     // Announce the outcome once, when the job reaches a terminal state.
     const announcedRef = useRef<number | null>(null);
@@ -176,6 +148,16 @@ export function AdminUploadPage() {
                             >
                                 {uploading ? 'Uploading…' : 'Start import'}
                             </Button>
+                            {activeJobId !== null && (
+                                <Link to={`/admin/uploads/${activeJobId}`}>
+                                    <Button
+                                        variant="outline"
+                                        leftIcon={<Activity className="size-4" aria-hidden />}
+                                    >
+                                        Processing status
+                                    </Button>
+                                </Link>
+                            )}
                             {(activeJobId !== null || file) && (
                                 <Button variant="ghost" onClick={startOver} disabled={uploading}>
                                     Start over

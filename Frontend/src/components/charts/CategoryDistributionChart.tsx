@@ -44,20 +44,11 @@ export function CategoryDistributionChart({ counts }: { counts: CategoryCount[] 
                     {...TOOLTIP_STYLE}
                     formatter={(value) => plural(Number(value), 'student')}
                 />
-                {/* An explicit payload, because Recharts otherwise sorts the
-                    legend alphabetically - which puts "Average" before
+                {/* `itemSorter={null}` keeps the data order. Recharts otherwise
+                    sorts the legend alphabetically - which puts "Average" before
                     "Critical" and loses the worst-to-best reading that the
                     bands are for. */}
-                <Legend
-                    iconType="circle"
-                    wrapperStyle={{ fontSize: '0.75rem' }}
-                    payload={data.map((entry) => ({
-                        id: entry.name,
-                        value: entry.name,
-                        type: 'circle',
-                        color: entry.fill,
-                    }))}
-                />
+                <Legend iconType="circle" wrapperStyle={{ fontSize: '0.75rem' }} itemSorter={null} />
             </PieChart>
         </ResponsiveContainer>
     );

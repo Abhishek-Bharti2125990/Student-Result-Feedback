@@ -1,4 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit';
+import type { RootState } from '@/store';
 import { analyticsApi } from '@/api/analyticsApi';
 import { isNotFound, toErrorMessage } from '@/api/client';
 import type { ClassAnalytics, PerformanceTrend } from '@/types/analytics';
@@ -18,6 +19,14 @@ interface AnalyticsState {
      * it fails the chart shows its empty state and the rest of the teacher
      * dashboard, which came from a different request, stays usable.
      */
+
+    /**
+     * Per-student trends for the teacher's category cards, keyed by student id.
+     * `null` marks a fetch that failed: the card then shows no trend rather than
+     * asking again on every render.
+     */
+    studentTrends: Record<number, PerformanceTrend | null>;
+    studentTrendsLoading: Record<number, boolean>;
 }
 
 const initialState: AnalyticsState = {
@@ -27,6 +36,8 @@ const initialState: AnalyticsState = {
     noData: false,
     classReport: null,
     classReportLoading: false,
+    studentTrends: {},
+    studentTrendsLoading: {},
 };
 
 export const fetchMyTrend = createAsyncThunk<
@@ -56,6 +67,30 @@ export const fetchClassReport = createAsyncThunk<
     }
 });
 
+export const fetchStudentTrend = createAsyncThunk<
+    PerformanceTrend | null,
+    number,
+    { state: RootState }
+>(
+    'analytics/studentTrend',
+    async (studentId) => {
+        try {
+            return await analyticsApi.studentTrend(studentId);
+        } catch {
+            // One card's trend line is not worth an error banner.
+            return null;
+        }
+    },
+    {
+        // Switching between categories re-renders the same students; a trend
+        // already held (or on its way) is not fetched twice.
+        condition: (studentId, { getState }) => {
+            const { studentTrends, studentTrendsLoading } = getState().analytics;
+            return !(studentId in studentTrends) && !studentTrendsLoading[studentId];
+        },
+    },
+);
+
 export const analyticsSlice = createSlice({
     name: 'analytics',
     initialState,
@@ -64,6 +99,14 @@ export const analyticsSlice = createSlice({
     },
     extraReducers: (builder) => {
         builder
+            .addCase(fetchStudentTrend.pending, (state, action) => {
+                state.studentTrendsLoading[action.meta.arg] = true;
+            })
+            .addCase(fetchStudentTrend.fulfilled, (state, action) => {
+                delete state.studentTrendsLoading[action.meta.arg];
+                state.studentTrends[action.meta.arg] = action.payload;
+            })
+
             .addCase(fetchClassReport.pending, (state) => {
                 state.classReportLoading = true;
             })

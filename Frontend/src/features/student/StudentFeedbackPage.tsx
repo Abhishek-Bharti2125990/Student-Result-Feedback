@@ -195,7 +195,7 @@ export function StudentFeedbackPage() {
                         title="Your study plan"
                         subtitle={
                             plan.length > 0
-                                ? `${doneCount} of ${plural(plan.length, 'step')} done`
+                                ? `${doneCount} of ${plural(plan.length, 'day')} done`
                                 : undefined
                         }
                         icon={<CalendarCheck className="size-4" aria-hidden />}
@@ -281,7 +281,7 @@ function PlanRow({ item, step, done, onToggle }: PlanRowProps) {
 
                 <span className="min-w-0 flex-1">
                     <span className="flex flex-wrap items-center gap-2">
-                        <Badge tone={done ? 'green' : 'blue'}>Step {step}</Badge>
+                        <Badge tone={done ? 'green' : 'blue'}>Day {step}</Badge>
                         <Badge tone="slate">{item.timeframe}</Badge>
                         {item.dailyMinutes > 0 && (
                             <span className="inline-flex items-center gap-1 text-xs text-slate-500">

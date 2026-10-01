@@ -40,16 +40,13 @@ export function SubjectComparisonChart({ subjects }: { subjects: SubjectPerforma
                     formatter={(value) => (value === null ? '—' : `${value}%`)}
                     labelFormatter={(_, payload) => payload?.[0]?.payload?.fullName ?? ''}
                 />
-                {/* Explicit payload: Recharts sorts the legend alphabetically,
-                    which would list "Class average" before "Your score" and bury
-                    the series the reader actually came for. */}
+                {/* `itemSorter={null}` keeps series order: Recharts otherwise sorts
+                    the legend alphabetically, which would list "Class average"
+                    before "Your score" and bury the series the reader came for. */}
                 <Legend
                     iconType="circle"
                     wrapperStyle={{ fontSize: '0.75rem', paddingTop: 8 }}
-                    payload={[
-                        { id: 'score', value: 'Your score', type: 'circle', color: CHART_COLORS.primary },
-                        { id: 'avg', value: 'Class average', type: 'circle', color: CHART_COLORS.comparison },
-                    ]}
+                    itemSorter={null}
                 />
                 <Bar
                     dataKey="score"

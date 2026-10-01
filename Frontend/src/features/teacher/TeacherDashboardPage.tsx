@@ -32,7 +32,7 @@ import { CATEGORY_ORDER, categoryStyle } from '@/lib/category';
 import { cn } from '@/lib/cn';
 import { percent, plural } from '@/lib/format';
 import { useAppDispatch, useAppSelector } from '@/store/hooks';
-import { fetchClassReport } from '@/store/slices/analyticsSlice';
+import { fetchClassReport, fetchStudentTrend } from '@/store/slices/analyticsSlice';
 import { fetchTeacherDashboard, selectCategory } from '@/store/slices/teacherSlice';
 
 export function TeacherDashboardPage() {
@@ -40,7 +40,7 @@ export function TeacherDashboardPage() {
     const { dashboard, loading, error, noData, selectedCategory, filters } = useAppSelector(
         (state) => state.teacher,
     );
-    const { classReport } = useAppSelector((state) => state.analytics);
+    const { classReport, studentTrends } = useAppSelector((state) => state.analytics);
 
     useEffect(() => {
         void dispatch(fetchTeacherDashboard(filters));
@@ -61,6 +61,12 @@ export function TeacherDashboardPage() {
         () => dashboard?.buckets.find((candidate) => candidate.category === selectedCategory),
         [dashboard, selectedCategory],
     );
+
+    // The card payload has no trend, so each visible student's is fetched on
+    // its own - only for the open category, and never twice (see the thunk).
+    useEffect(() => {
+        bucket?.students.forEach((student) => void dispatch(fetchStudentTrend(student.studentId)));
+    }, [dispatch, bucket]);
 
     if (loading && !dashboard) {
         return (
@@ -216,6 +222,7 @@ export function TeacherDashboardPage() {
                                     key={student.studentId}
                                     student={student}
                                     classSize={dashboard.totalStudents}
+                                    trend={studentTrends[student.studentId]}
                                 />
                             ))}
                         </div>

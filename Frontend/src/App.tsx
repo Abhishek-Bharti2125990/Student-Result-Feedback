@@ -31,6 +31,9 @@ const AdminUploadPage = lazy(() =>
 const AdminUploadsPage = lazy(() =>
     import('@/features/admin/AdminUploadsPage').then((m) => ({ default: m.AdminUploadsPage })),
 );
+const AdminUploadStatusPage = lazy(() =>
+    import('@/features/admin/AdminUploadStatusPage').then((m) => ({ default: m.AdminUploadStatusPage })),
+);
 
 /**
  * The route table.
@@ -115,6 +118,16 @@ export default function App() {
                         <ProtectedRoute allow={['ADMIN']}>
                             <Suspense fallback={<Loader label="Loading…" />}>
                                 <AdminUploadsPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/uploads/:jobId"
+                    element={
+                        <ProtectedRoute allow={['ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading…" />}>
+                                <AdminUploadStatusPage />
                             </Suspense>
                         </ProtectedRoute>
                     }
