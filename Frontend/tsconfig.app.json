@@ -16,7 +16,15 @@
     "noEmit": true,
     "jsx": "react-jsx",
 
+    /* `@/x` resolves to `src/x`; mirrored by resolve.alias in vite.config.ts.
+       No `baseUrl`: it is deprecated in TypeScript 6, and `paths` entries are
+       resolved relative to this file without it. */
+    "paths": {
+      "@/*": ["./src/*"]
+    },
+
     /* Linting */
+    "strict": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "erasableSyntaxOnly": true,

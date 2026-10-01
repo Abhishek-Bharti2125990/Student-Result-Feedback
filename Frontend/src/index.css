@@ -1,1 +1,40 @@
 @import "tailwindcss";
+
+/*
+ * Tailwind 4 keeps theme tokens in CSS rather than a JS config.
+ *
+ * Only two things are set here. Everything else is a stock Tailwind utility, so
+ * the design stays legible to anyone who knows Tailwind and does not depend on
+ * a bespoke scale.
+ */
+@theme {
+    /* Inter where available, falling back to the platform UI stack. */
+    --font-sans: 'Inter', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', sans-serif;
+}
+
+@layer base {
+    html {
+        -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+        font-family: var(--font-sans);
+        /* Antialiasing matters at the small label sizes the dashboards use. */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+    }
+
+    /*
+     * Keyboard focus must stay visible: the teacher dashboard's category filter
+     * is a row of buttons, and without a ring it cannot be navigated at all.
+     * Mouse clicks are left alone via :focus-visible.
+     */
+    :focus-visible {
+        outline-offset: 2px;
+    }
+}
+
+/* Recharts sets its own focus outline on every SVG wrapper on hover. */
+.recharts-wrapper:focus {
+    outline: none;
+}

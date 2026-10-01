@@ -1,82 +1,129 @@
-// src/App.tsx
-import React from 'react';
-import { Routes, Route, Navigate, useNavigate } from 'react-router-dom';
-import AuthPage from './auth/AuthPage';
-import Home from './home/Home';
-import StudentDashboard from './dashboard/Student/StudentDashboard';
-import TeacherDashboard from './dashboard/Teacher/TeacherDashboard';
-import { Navbar } from './components/navbar';
-import { ProtectedRoute } from './components/protectedRoute';
-import { useAppDispatch, useAppSelector } from './redux/hooks';
-import type { AuthUser } from './auth/types';
-import { login, logout } from './redux/slices/authSlice';
+import { Suspense, lazy } from 'react';
+import { Navigate, Route, Routes } from 'react-router-dom';
+import { AppLayout } from '@/components/layout/AppLayout';
+import { Loader } from '@/components/ui/Loader';
+import { LoginPage } from '@/features/auth/LoginPage';
+import { ProtectedRoute, RoleLanding } from '@/routes/ProtectedRoute';
 
+/*
+ * The authenticated pages are split out of the initial bundle.
+ *
+ * Recharts is the single largest dependency here and it is not needed to render
+ * the login screen - which is the only page an unauthenticated visitor ever
+ * sees, and therefore the one whose first paint matters most. Login stays in
+ * the main chunk; everything behind it arrives on navigation.
+ */
+const StudentDashboardPage = lazy(() =>
+    import('@/features/student/StudentDashboardPage').then((m) => ({ default: m.StudentDashboardPage })),
+);
+const StudentFeedbackPage = lazy(() =>
+    import('@/features/student/StudentFeedbackPage').then((m) => ({ default: m.StudentFeedbackPage })),
+);
+const StudentResourcesPage = lazy(() =>
+    import('@/features/student/StudentResourcesPage').then((m) => ({ default: m.StudentResourcesPage })),
+);
+const TeacherDashboardPage = lazy(() =>
+    import('@/features/teacher/TeacherDashboardPage').then((m) => ({ default: m.TeacherDashboardPage })),
+);
+const AdminUploadPage = lazy(() =>
+    import('@/features/admin/AdminUploadPage').then((m) => ({ default: m.AdminUploadPage })),
+);
+const AdminUploadsPage = lazy(() =>
+    import('@/features/admin/AdminUploadsPage').then((m) => ({ default: m.AdminUploadsPage })),
+);
+
+/**
+ * The route table.
+ *
+ * Every authenticated route sits inside one `AppLayout` element rather than
+ * each page rendering its own shell, so the sidebar and navbar are not
+ * remounted on navigation - which would reset the mobile drawer and flash the
+ * chrome on every click. The `Suspense` boundary is inside the layout for the
+ * same reason: a lazy page loads with the navigation already on screen.
+ *
+ * `/student/**` admits staff as well as students: the pages take an optional
+ * `studentId`, and a teacher looking at one student's card wants exactly this
+ * screen. The row-level check is the backend's, not this table's.
+ */
 export default function App() {
-    const dispatch = useAppDispatch();
-    const navigate = useNavigate();
-
-    // Redux state se current user nikalo
-    const { user } = useAppSelector((state) => state.auth);
-
-    // Login action trigger
-    const handleLoginSuccess = (userData: AuthUser) => {
-        dispatch(login(userData));
-        if (userData.role === 'TEACHER') {
-            navigate('/teacher-dashboard');
-        } else {
-            navigate('/student-dashboard');
-        }
-    };
-
-    // Logout action trigger
-    const handleLogout = () => {
-        dispatch(logout());
-        navigate('/login');
-    };
-
     return (
-        <div className="min-h-screen bg-slate-950 flex flex-col">
-            <Navbar user={user} onLogout={handleLogout} />
+        <Routes>
+            <Route path="/login" element={<LoginPage />} />
 
-            <div className="flex-1">
-                <Routes>
-                    <Route path="/" element={<Home />} />
+            <Route
+                element={
+                    <ProtectedRoute>
+                        <AppLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route
+                    path="/student/dashboard"
+                    element={
+                        <ProtectedRoute allow={['STUDENT', 'TEACHER', 'ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading your dashboard…" />}>
+                                <StudentDashboardPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/student/feedback"
+                    element={
+                        <ProtectedRoute allow={['STUDENT', 'TEACHER', 'ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading your feedback…" />}>
+                                <StudentFeedbackPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/student/resources"
+                    element={
+                        <ProtectedRoute allow={['STUDENT', 'TEACHER', 'ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading resources…" />}>
+                                <StudentResourcesPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
 
-                    <Route
-                        path="/login"
-                        element={
-                            user ? (
-                                <Navigate
-                                    to={user.role === 'TEACHER' ? '/teacher-dashboard' : '/student-dashboard'}
-                                    replace
-                                />
-                            ) : (
-                                <AuthPage onLoginSuccess={handleLoginSuccess} />
-                            )
-                        }
-                    />
+                <Route
+                    path="/teacher/dashboard"
+                    element={
+                        <ProtectedRoute allow={['TEACHER', 'ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading the class dashboard…" />}>
+                                <TeacherDashboardPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
 
-                    <Route
-                        path="/student-dashboard"
-                        element={
-                            <ProtectedRoute user={user} allowedRole="STUDENT">
-                                <StudentDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
+                <Route
+                    path="/admin/upload"
+                    element={
+                        <ProtectedRoute allow={['ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading…" />}>
+                                <AdminUploadPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/admin/uploads"
+                    element={
+                        <ProtectedRoute allow={['ADMIN']}>
+                            <Suspense fallback={<Loader label="Loading…" />}>
+                                <AdminUploadsPage />
+                            </Suspense>
+                        </ProtectedRoute>
+                    }
+                />
+            </Route>
 
-                    <Route
-                        path="/teacher-dashboard"
-                        element={
-                            <ProtectedRoute user={user} allowedRole="TEACHER">
-                                <TeacherDashboard />
-                            </ProtectedRoute>
-                        }
-                    />
-
-                    <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
-            </div>
-        </div>
+            {/* "/" sends each role to its own home; anything unknown follows. */}
+            <Route path="/" element={<RoleLanding />} />
+            <Route path="*" element={<Navigate to="/" replace />} />
+        </Routes>
     );
 }
