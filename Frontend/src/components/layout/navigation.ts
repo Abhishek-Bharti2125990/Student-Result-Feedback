@@ -4,6 +4,7 @@ import {
     LayoutDashboard,
     Sparkles,
     Upload,
+    UserCog,
     Users,
     type LucideIcon,
 } from 'lucide-react';
@@ -19,10 +20,11 @@ export interface NavItem {
 /**
  * The sidebar, per role.
  *
- * Only routes the backend can actually serve appear here. There is no student
- * CRUD, no teacher CRUD and no resource management, because those endpoints do
- * not exist - a nav item leading to a page that cannot load is worse than a
- * shorter menu.
+ * Only routes the backend can actually serve appear here. There is no resource
+ * management and no standalone student or teacher roster editor, because those
+ * endpoints do not exist - a nav item leading to a page that cannot load is
+ * worse than a shorter menu. Accounts are managed under Users, which creates the
+ * student and teacher records as a side effect of creating their logins.
  */
 export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
     STUDENT: [
@@ -66,6 +68,12 @@ export const NAV_BY_ROLE: Record<Role, NavItem[]> = {
             icon: History,
             description: 'Past imports and their error reports',
         },
+        {
+            label: 'Users',
+            to: '/admin/users',
+            icon: UserCog,
+            description: 'Logins for admins, teachers and students',
+        },
     ],
 };
 
@@ -86,4 +94,5 @@ export const SEGMENT_LABELS: Record<string, string> = {
     resources: 'Resources',
     upload: 'Upload Results',
     uploads: 'Upload History',
+    users: 'Users',
 };

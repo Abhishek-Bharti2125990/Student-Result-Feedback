@@ -24,6 +24,12 @@ import org.springframework.web.bind.annotation.RestController;
  * refresh and logout bodies are themselves the credential. {@code /register} is
  * restricted to ADMIN in {@code SecurityConfig} - this is a school system, so
  * accounts are issued by the office, not self-registered.
+ *
+ * <p>{@code /register} predates {@link UserAdminController} and creates a login
+ * only against a student record that already exists. New callers should use
+ * {@code POST /api/admin/users}, which is the full account lifecycle: it creates
+ * the student record when the admission number is unknown, and it is the only
+ * route that can edit, deactivate or delete an account afterwards.
  */
 @RestController
 @RequestMapping("/api/auth")

@@ -21,7 +21,13 @@ export default defineConfig({
             // behave the same. Proxying here also means the browser never makes
             // a cross-origin request, so CORS cannot break a demo.
             '/api': {
-                target: process.env.VITE_API_TARGET ?? 'http://localhost:8080',
+                // Must match `server.port` in the backend's application.yml.
+                // If it does not, the proxy silently forwards to whatever else
+                // owns that port - on a machine running Jenkins on 8080 that is
+                // Jenkins, which answers a login POST with its own 403 "No
+                // valid crumb was included in the request" and never reaches
+                // Spring Security at all.
+                target: process.env.VITE_API_TARGET ?? 'http://localhost:8081',
                 changeOrigin: true,
             },
         },

@@ -19,6 +19,14 @@ public interface RefreshTokenRepository extends JpaRepository<RefreshToken, Long
     @Query("update RefreshToken t set t.revoked = true where t.user.id = :userId and t.revoked = false")
     int revokeAllForUser(@Param("userId") Long userId);
 
+    /**
+     * Removes every token for a user, used when the account itself is deleted:
+     * revoking would leave rows holding a foreign key onto the login.
+     */
+    @Modifying
+    @Query("delete from RefreshToken t where t.user.id = :userId")
+    int deleteAllByUserId(@Param("userId") Long userId);
+
     @Modifying
     @Query("delete from RefreshToken t where t.expiresAt < :cutoff")
     int deleteExpired(@Param("cutoff") Instant cutoff);

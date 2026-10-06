@@ -21,5 +21,16 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
 
     boolean existsByEmail(String email);
 
+    /**
+     * Uniqueness checks for an edit, which must not collide with the row being
+     * edited: a user keeping their own username is not a conflict.
+     */
+    boolean existsByUsernameAndIdNot(String username, Long id);
+
+    boolean existsByEmailAndIdNot(String email, Long id);
+
     List<UserAccount> findByRole(Role role);
+
+    /** The admin list, grouped by role so the three kinds of account read apart. */
+    List<UserAccount> findAllByOrderByRoleAscUsernameAsc();
 }

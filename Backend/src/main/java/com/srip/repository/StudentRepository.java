@@ -12,6 +12,9 @@ public interface StudentRepository extends JpaRepository<Student, Long> {
 
     Optional<Student> findByUserId(Long userId);
 
+    /** Loaded in one query by the admin user list, to avoid a lookup per row. */
+    List<Student> findByUserIdIn(List<Long> userIds);
+
     List<Student> findByClassName(String className);
 
     List<Student> findByClassNameAndSection(String className, String section);

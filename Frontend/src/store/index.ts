@@ -6,6 +6,7 @@ import authReducer, { sessionExpired } from './slices/authSlice';
 import studentReducer from './slices/studentSlice';
 import teacherReducer from './slices/teacherSlice';
 import uiReducer from './slices/uiSlice';
+import usersReducer from './slices/usersSlice';
 
 export const store = configureStore({
     reducer: {
@@ -13,6 +14,7 @@ export const store = configureStore({
         student: studentReducer,
         teacher: teacherReducer,
         admin: adminReducer,
+        users: usersReducer,
         analytics: analyticsReducer,
         ui: uiReducer,
     },

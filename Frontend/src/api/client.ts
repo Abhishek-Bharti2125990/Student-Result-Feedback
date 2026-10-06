@@ -141,7 +141,7 @@ export function toErrorMessage(error: unknown, fallback = 'Something went wrong'
             return 'The server took too long to respond. Is the backend running?';
         }
         if (!error.response) {
-            return 'Could not reach the server. Check that the backend is running on port 8080.';
+            return 'Could not reach the server. Check that the backend is running on port 8081.';
         }
 
         const { status, statusText, data } = error.response;
@@ -151,7 +151,7 @@ export function toErrorMessage(error: unknown, fallback = 'Something went wrong'
         // "502 Bad Gateway" would send someone hunting for a bug in the app
         // when the actual problem is that the backend is not running.
         if (status === 502 || status === 503 || status === 504) {
-            return 'The API is not responding. Check that the backend is running on port 8080.';
+            return 'The API is not responding. Check that the backend is running on port 8081.';
         }
 
         // The backend sends `{ message }` on every handled error.

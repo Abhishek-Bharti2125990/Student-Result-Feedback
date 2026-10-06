@@ -54,6 +54,10 @@ public class Teacher {
         return staffNo;
     }
 
+    public void setStaffNo(String staffNo) {
+        this.staffNo = staffNo;
+    }
+
     public String getFullName() {
         return fullName;
     }

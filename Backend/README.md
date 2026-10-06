@@ -160,8 +160,11 @@ file: upload it to see the per-line rejection report.
 | POST | `/api/auth/login` | Returns an access token, a refresh token and the caller's profile |
 | POST | `/api/auth/refresh` | Rotates the refresh token |
 | POST | `/api/auth/logout` | Revokes every refresh token for the account |
-| POST | `/api/auth/register` | ADMIN only |
+| POST | `/api/auth/register` | ADMIN only; superseded by `POST /api/admin/users` |
 | GET  | `/api/auth/me` | The caller's own profile |
+
+`/api/auth/register` predates user management and only issues a login against a
+student record that already exists. Prefer `POST /api/admin/users`, below.
 
 ### Student
 
@@ -195,6 +198,44 @@ All take optional `?className=` and `?examId=`.
 | GET  | `/api/admin/upload` | Upload history, newest first |
 | GET  | `/api/admin/students` | Full roster |
 | POST | `/api/admin/teacher-subjects` | Assign a class/subject to a teacher |
+
+### Admin — user management
+
+| Method | Path | Notes |
+|---|---|---|
+| GET    | `/api/admin/users` | Every account; optional `?role=` and `?query=` |
+| GET    | `/api/admin/users/{id}` | One account with its companion record |
+| POST   | `/api/admin/users` | Creates the login and the record its role implies |
+| PUT    | `/api/admin/users/{id}` | Edits the login and its companion record |
+| PATCH  | `/api/admin/users/{id}/status` | `{"enabled": true\|false}` |
+| DELETE | `/api/admin/users/{id}` | 204, or 409 when it would destroy history |
+
+Four rules are worth knowing before calling these.
+
+**A user is two records.** A STUDENT login owns a row in `students` and a
+TEACHER login one in `teachers`; marks, analytics and subject assignments hang
+off those, not off the login. Creating an account creates the companion record,
+and the response flattens both halves into one view.
+
+**A student account links by admission number.** `admissionNo` that already
+exists attaches the login to that child and inherits their results — results are
+imported by admission number long before logins exist, and a second record would
+split one child's history in two. An unknown number creates the record, and that
+is the only case where `className` and `academicYear` are required.
+
+**The role is not editable.** `PUT` takes no `role`, because moving an account
+between roles would strand whatever the old role owned. A role change is a delete
+and a create.
+
+**Deactivating is the safe operation.** `PATCH .../status` with `enabled: false`
+revokes the refresh tokens, and the JWT filter re-reads `enabled` on every
+request — so the access token already in the user's hands stops working on its
+next call rather than lasting until it expires. `DELETE` keeps a student's record
+and marks but removes a teacher's record and subject assignments, and is refused
+with 409 for any account that has imported a results file, because
+`upload_jobs.uploaded_by` is a non-null foreign key onto the login. An admin can
+neither deactivate nor delete their own account, which is also what guarantees
+the platform always has one working administrator.
 
 ### Detail views behind the dashboards
 
@@ -316,6 +357,7 @@ Access control has two layers, because one is not enough:
 | `POST /api/auth/login`, `/refresh`, `/logout` | ✅ | ✅ | ✅ |
 | `POST /api/auth/register` | — | — | ✅ |
 | `POST /api/admin/upload`, `/api/admin/**` | — | — | ✅ |
+| `/api/admin/users/**` | — | — | ✅ |
 | `POST /api/uploads` | — | ✅ | ✅ |
 | `GET /api/student/**` | own only | ✅ | ✅ |
 | `GET /api/teacher/**` | — | ✅ | ✅ |
